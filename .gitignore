@@ -5,7 +5,7 @@ layout_data/
 convert_weight.py
 *.pt
 *.ipynb
-*.sh
+script.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

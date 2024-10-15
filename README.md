@@ -19,12 +19,59 @@ We introduce DocLayout-YOLO, which not only enhances accuracy but also preserves
 
 ## Quick Start
 
-**1. Pypi installation**
+### 1. Environment Setup
+
+To set up your environment, follow these steps:
+
+```bash
+conda create -n doclayout_yolo python=3.10
+conda activate doclayout_yolo
+pip install -r requirements.txt
+pip install -e .
+```
+
+**Note:** If you only need the package for inference, you can simply install it via pip:
+
 ```bash
 pip install doclayout-yolo
 ```
 
-**2. Prediction**
+### 2. Prediction
+
+You can perform predictions using either a script or the SDK:
+
+- **Script**
+
+  Run the following command to make a prediction using the script:
+
+  ```bash
+  python demo.py --model path/to/model --image-path path/to/image
+  ```
+
+- **SDK**
+
+  Here is an example of how to use the SDK for prediction:
+
+  ```python
+  import cv2
+  from doclayout_yolo import YOLOv10
+
+  # Load the pre-trained model
+  model = YOLOv10("path/to/provided/model")
+
+  # Perform prediction
+  det_res = model.predict(
+      "path/to/image",   # Image to predict
+      imgsz=1024,        # Prediction image size
+      conf=0.2,          # Confidence threshold
+      device="cuda:0"    # Device to use (e.g., 'cuda:0' or 'cpu')
+  )
+
+  # Annotate and save the result
+  annotated_frame = det_res[0].plot(pil=True, line_width=5, font_size=20)
+  cv2.imwrite("result.jpg", annotated_frame)
+  ```
+
 
 We provide model fine-tuned on **DocStructBench** for prediction, **which is capable of handing various document types**. Model can be downloaded from [here](https://huggingface.co/juliozhao/DocLayout-YOLO-DocStructBench/tree/main) and example images can be found under ```assets/example```.
 
@@ -32,36 +79,12 @@ We provide model fine-tuned on **DocStructBench** for prediction, **which is cap
   <img src="assets/showcase.png" width=100%> <br>
 </p>
 
-Example code for prediction:
-```python
-import cv2
-from doclayout_yolo import YOLOv10
-model = YOLOv10("path to provided model")  # load an official model
-det_res = model.predict(
-    "image to predict",
-    imgsz=1024,    # prediction image size
-    conf=0.2,    # prediction score threshold
-    device="0",    # device to use
-)
-annotated_frame = det_res[0].plot(pil=True, line_width=5, font_size=20)
-cv2.imwrite("result.jpg", annotated_frame)
-```
 
 You also can use ```predict_single.py``` for prediction with custom inference settings. For batch process, please refer to [PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit/tree/main).
 
 ## Training and Evaluation on Public DLA Datasets
 
-### 1. Environment Preparation
-
-`conda` virtual environment is recommended. 
-```
-conda create -n doclayout_yolo python=3.9
-conda activate doclayout_yolo
-pip install -r requirements.txt
-pip install -e .
-```
-
-### 2. Data Preparation
+### Data Preparation
 
 1. specify data root path
 
@@ -90,7 +113,7 @@ the file structure is as follows:
     └── train.txt
 ```
 
-### 3. Training and Evaluation
+### Training and Evaluation
 
 Training is conducted on 8 GPUs with a global batch size of 64 (8 images per device), detailed settings and checkpoints are as follows:
 

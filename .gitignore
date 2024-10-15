@@ -1,4 +1,5 @@
 checkpoints/
+outputs/
 dist/
 doclayout_yolo.egg-info/
 layout_data/

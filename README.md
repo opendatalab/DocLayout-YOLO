@@ -26,7 +26,6 @@ To set up your environment, follow these steps:
 ```bash
 conda create -n doclayout_yolo python=3.10
 conda activate doclayout_yolo
-pip install -r requirements.txt
 pip install -e .
 ```
 

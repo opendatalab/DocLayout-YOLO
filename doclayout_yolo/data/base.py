@@ -107,11 +107,6 @@ class BaseDataset(Dataset):
 
         # Transforms
         self.transforms = self.build_transforms(hyp=hyp)
-        
-        # s3 client
-        from petrel_client.client import Client
-        conf_path = '~/petreloss.conf'
-        self.client = Client(conf_path)
 
     def get_img_files(self, img_path):
         """Read image files."""
@@ -158,14 +153,6 @@ class BaseDataset(Dataset):
                     self.labels[i]["keypoints"] = keypoints[j]
             if self.single_cls:
                 self.labels[i]["cls"][:, 0] = 0
-
-    def read_from_ceph(self, f):
-        img_bytes = self.client.get(f)
-        assert(img_bytes is not None)
-        img_mem_view = memoryview(img_bytes)
-        img_array = np.frombuffer(img_mem_view, np.uint8)
-        img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
-        return img
                 
     def load_image(self, i, rect_mode=True):
         """Loads 1 image from dataset index 'i', returns (im, resized hw)."""
@@ -179,10 +166,7 @@ class BaseDataset(Dataset):
                     Path(fn).unlink(missing_ok=True)
                     im = cv2.imread(f)  # BGR
             else:  # read image
-                if f.startswith("s3://"):
-                    im = self.read_from_ceph(f)  # BGR
-                else:
-                    im = cv2.imread(f)  # BGR
+                im = cv2.imread(f)  # BGR
             if im is None:
                 raise FileNotFoundError(f"Image Not Found {f}")
 

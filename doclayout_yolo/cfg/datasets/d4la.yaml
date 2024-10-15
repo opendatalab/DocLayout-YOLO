@@ -1,0 +1,45 @@
+# Ultralytics YOLO 🚀, AGPL-3.0 license
+# COCO 2017 dataset https://cocodataset.org by Microsoft
+# Documentation: https://docs.doclayout_yolo.com/datasets/detect/coco/
+# Example usage: yolo train data=coco.yaml
+# parent
+# ├── doclayout_yolo
+# └── datasets
+#     └── coco  ← downloads here (20.1 GB)
+
+# Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
+# path: /mnt/hwfile/opendatalab/zhaozhiyuan/yolov10/D4LA # dataset root dir
+path: ./layout_data/D4LA
+train: train.txt # train images (relative to 'path') 118287 images
+val: test.txt # val images (relative to 'path') 5000 images
+test: test.txt # 20288 of 40670 images, submit to https://competitions.codalab.org/competitions/20794
+
+# Classes
+names:
+  0: "DocTitle"
+  1: "ParaTitle"
+  2: "ParaText"
+  3: "ListText"
+  4: "RegionTitle"
+  5: "Date"
+  6: "LetterHead"
+  7: "LetterDear"
+  8: "LetterSign"
+  9: "Question"
+  10: "OtherText"
+  11: "RegionKV"
+  12: "RegionList"
+  13: "Abstract"
+  14: "Author"
+  15: "TableName"
+  16: "Table"
+  17: "Figure"
+  18: "FigureName"
+  19: "Equation"
+  20: "Reference"
+  21: "Footer"
+  22: "PageHeader"
+  23: "PageFooter"
+  24: "Number"
+  25: "Catalog"
+  26: "PageNumber"

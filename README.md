@@ -1,7 +1,7 @@
 # DocLayout-YOLO: Advancing Document Layout Analysis with Mesh-candidate Bestfit and Global-to-local perception
 
 
-Official PyTorch implementation of **DocLayout-YOLO**.
+Official PyTorch implementation of [DocLayout-YOLO](https://arxiv.org/abs/2410.12628).
 
 Zhiyuan Zhao, Hengrui Kang, Bin Wang, Conghui He
 
@@ -125,8 +125,23 @@ Training is conducted on 8 GPUs with a global batch size of 64 (8 images per dev
 
 The DocSynth300K pretrained model can be downloaded from [here](https://huggingface.co/juliozhao/DocLayout-YOLO-DocSynth300K-pretrain). Change ```checkpoint.pt``` to the path of model to be evaluated during evaluation.
 
+
 ## Acknowledgement
 
 The code base is built with [ultralytics](https://github.com/ultralytics/ultralytics) and [YOLO-v10](https://github.com/lyuwenyu/RT-DETR).
 
 Thanks for these great work!
+
+## Citation
+
+```bibtex
+@misc{zhao2024doclayoutyoloenhancingdocumentlayout,
+      title={DocLayout-YOLO: Enhancing Document Layout Analysis through Diverse Synthetic Data and Global-to-Local Adaptive Perception}, 
+      author={Zhiyuan Zhao and Hengrui Kang and Bin Wang and Conghui He},
+      year={2024},
+      eprint={2410.12628},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2410.12628}, 
+}
+```

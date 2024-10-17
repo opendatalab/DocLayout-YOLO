@@ -4,6 +4,7 @@ Official PyTorch implementation of [DocLayout-YOLO](https://arxiv.org/abs/2410.1
 
 Zhiyuan Zhao, Hengrui Kang, Bin Wang, Conghui He
 
+[![arXiv](https://img.shields.io/badge/arXiv-2405.14458-b31b1b.svg)](https://arxiv.org/abs/2410.12628) [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97-Models%20and%20Data-yellow)](https://huggingface.co/collections/juliozhao/doclayout-yolo-670cdec674913d9a6f77b542)
 
 ## Abstract
 ```text

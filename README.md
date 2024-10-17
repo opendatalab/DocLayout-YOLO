@@ -1,16 +1,14 @@
-# DocLayout-YOLO: Advancing Document Layout Analysis with Mesh-candidate Bestfit and Global-to-local perception
-
+# DocLayout-YOLO
 
 Official PyTorch implementation of [DocLayout-YOLO](https://arxiv.org/abs/2410.12628).
 
 Zhiyuan Zhao, Hengrui Kang, Bin Wang, Conghui He
 
-<details>
-  <summary>
-  <font size="+1">Abstract</font>
-  </summary>
-We introduce DocLayout-YOLO, which not only enhances accuracy but also preserves the speed advantage through optimization from pre-training and model perspectives in a document-tailored manner. In terms of robust document pretraining, we innovatively regard document synthetic as a 2D bin packing problem and introduce Mesh-candidate Bestfit, which enables the generation of large-scale, diverse document datasets. The model, pre-trained on the resulting DocSynth300K dataset, significantly enhances fine-tuning performance across a variety of document types. In terms of model enhancement for document understanding, we propose a Global-to-local Controllable Receptive Module which emulates the human visual process from global to local perspectives and features a controllable module for feature extraction and integration. Experimental results on extensive downstream datasets show that the proposed DocLayout-YOLO excels at both speed and accuracy.
-</details>
+
+## Abstract
+```text
+Document Layout Analysis is crucial for real-world document understanding systems, but it encounters a challenging trade-off between speed and accuracy: multimodal methods leveraging both text and visual features achieve higher accuracy but suffer from significant latency, whereas unimodal methods relying solely on visual features offer faster processing speeds at the expense of accuracy. To address this dilemma, we introduce DocLayout-YOLO, a novel approach that enhances accuracy while maintaining speed advantages through document-specific optimizations in both pre-training and model design. For robust document pre-training, we introduce the Mesh-candidate BestFit algorithm, which frames document synthesis as a two-dimensional bin packing problem, generating the large-scale, diverse DocSynth-300K dataset. Pre-training on the resulting DocSynth-300K dataset significantly improves fine-tuning performance across various document types. In terms of model optimization, we propose a Global-to-Local Controllable Receptive Module that is capable of better handling multi-scale variations of document elements. Furthermore, to validate performance across different document types, we introduce a complex and challenging benchmark named DocStructBench. Extensive experiments on downstream datasets demonstrate that DocLayout-YOLO excels in both speed and accuracy. 
+```
 
 <p align="center">
   <img src="assets/comp.png" width=52%>
@@ -144,4 +142,12 @@ Thanks for these great work!
       primaryClass={cs.CV},
       url={https://arxiv.org/abs/2410.12628}, 
 }
+
+@article{wang2024mineru,
+  title={MinerU: An Open-Source Solution for Precise Document Content Extraction},
+  author={Wang, Bin and Xu, Chao and Zhao, Xiaomeng and Ouyang, Linke and Wu, Fan and Zhao, Zhiyuan and Xu, Rui and Liu, Kaiwen and Qu, Yuan and Shang, Fukai and others},
+  journal={arXiv preprint arXiv:2409.18839},
+  year={2024}
+}
+
 ```

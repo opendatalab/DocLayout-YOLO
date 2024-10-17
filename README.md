@@ -19,7 +19,7 @@ Document Layout Analysis is crucial for real-world document understanding system
 
 ### 1. Environment Setup
 
-To set up your environment, follow these steps:
+Follow these steps to set up your environment:
 
 ```bash
 conda create -n doclayout_yolo python=3.10
@@ -35,7 +35,7 @@ pip install doclayout-yolo
 
 ### 2. Prediction
 
-You can perform predictions using either a script or the SDK:
+You can make predictions using either a script or the SDK:
 
 - **Script**
 
@@ -83,7 +83,7 @@ You also can use ```predict_single.py``` for prediction with custom inference se
 
 ### Data Preparation
 
-1. specify data root path
+1. specify  the data root path
 
 Find your ultralytics config file (for Linux user in ```$HOME/.config/Ultralytics/settings.yaml)``` and change ```datasets_dir``` to project root path.
 
@@ -112,7 +112,7 @@ the file structure is as follows:
 
 ### Training and Evaluation
 
-Training is conducted on 8 GPUs with a global batch size of 64 (8 images per device), detailed settings and checkpoints are as follows:
+Training is conducted on 8 GPUs with a global batch size of 64 (8 images per device). The detailed settings and checkpoints are as follows:
 
 | Dataset | Model | DocSynth300K Pretrained? | imgsz | Learning rate | Finetune | Evaluation | AP50 | mAP | Checkpoint |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
@@ -128,7 +128,7 @@ The DocSynth300K pretrained model can be downloaded from [here](https://huggingf
 
 The code base is built with [ultralytics](https://github.com/ultralytics/ultralytics) and [YOLO-v10](https://github.com/lyuwenyu/RT-DETR).
 
-Thanks for these great work!
+Thanks for their great work!
 
 ## Citation
 

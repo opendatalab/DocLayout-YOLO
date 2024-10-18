@@ -78,7 +78,7 @@ We provide model fine-tuned on **DocStructBench** for prediction, **which is cap
 </p>
 
 
-You also can use ```predict_single.py``` for prediction with custom inference settings. For batch process, please refer to [PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit/tree/main).
+For PDF content extraction, please refer to [PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit/tree/main).
 
 ## Training and Evaluation on Public DLA Datasets
 

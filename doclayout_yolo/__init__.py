@@ -1,6 +1,6 @@
 # Ultralytics YOLO 🚀, AGPL-3.0 license
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 from doclayout_yolo.data.explorer.explorer import Explorer
 from doclayout_yolo.models import RTDETR, SAM, YOLO, YOLOWorld, YOLOv10

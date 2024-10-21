@@ -4,7 +4,7 @@ Official PyTorch implementation of [DocLayout-YOLO](https://arxiv.org/abs/2410.1
 
 Zhiyuan Zhao, Hengrui Kang, Bin Wang, Conghui He
 
-[![arXiv](https://img.shields.io/badge/arXiv-2405.14458-b31b1b.svg)](https://arxiv.org/abs/2410.12628) [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97-Models%20and%20Data-yellow)](https://huggingface.co/collections/juliozhao/doclayout-yolo-670cdec674913d9a6f77b542)
+[![arXiv](https://img.shields.io/badge/arXiv-2405.14458-b31b1b.svg)](https://arxiv.org/abs/2410.12628) [![Online Demo](https://img.shields.io/badge/%F0%9F%A4%97-Online%20Demo-yellow)](https://huggingface.co/spaces/opendatalab/DocLayout-YOLO) [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97-Models%20and%20Data-yellow)](https://huggingface.co/collections/juliozhao/doclayout-yolo-670cdec674913d9a6f77b542)
 
 ## Abstract
 ```text
@@ -17,6 +17,8 @@ Document Layout Analysis is crucial for real-world document understanding system
 </p>
 
 ## Quick Start
+
+[Online Demo](https://huggingface.co/spaces/opendatalab/DocLayout-YOLO) is now available. For local development, follow steps below:
 
 ### 1. Environment Setup
 

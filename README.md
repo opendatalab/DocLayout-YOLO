@@ -16,6 +16,15 @@ Document Layout Analysis is crucial for real-world document understanding system
   <img src="assets/radar.png" width=44%> <br>
 </p>
 
+## News 🚀🚀🚀
+
+**2024.10.21** 🎉🎉  Online demo available on [🤗Huggingface](https://huggingface.co/spaces/opendatalab/DocLayout-YOLO).
+
+**2024.10.18** 🎉🎉  DocLayout-YOLO is implemented in [PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit) for document context extraction.
+
+**2024.10.16** 🎉🎉  Paper now available on [ArXiv](https://arxiv.org/abs/2410.12628).   
+
+
 ## Quick Start
 
 [Online Demo](https://huggingface.co/spaces/opendatalab/DocLayout-YOLO) is now available. For local development, follow steps below:
@@ -80,7 +89,22 @@ We provide model fine-tuned on **DocStructBench** for prediction, **which is cap
 </p>
 
 
-For PDF content extraction, please refer to [PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit/tree/main).
+**Note:** For PDF content extraction, please refer to [PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit/tree/main) and [MinerU](https://github.com/opendatalab/MinerU).
+
+**Note:** Thanks to [Neils](https://github.com/NielsRogge), DocLayout-YOLO now supports implementation directly from 🤗Huggingface, you can load model as follows:
+
+```python
+filepath = hf_hub_download(repo_id="juliozhao/DocLayout-YOLO-DocStructBench", filename="doclayout_yolo_docstructbench_imgsz1024.pt")
+model = YOLOv10(filepath)
+```
+
+or directly load using ```from_pretrained```:
+
+```python
+model = YOLOv10.from_pretrained("juliozhao/DocLayout-YOLO-DocStructBench")
+```
+
+more details can be found at [this PR](https://github.com/opendatalab/DocLayout-YOLO/pull/6).
 
 ## Training and Evaluation on Public DLA Datasets
 
@@ -90,7 +114,7 @@ For PDF content extraction, please refer to [PDF-Extract-Kit](https://github.com
 
 Find your ultralytics config file (for Linux user in ```$HOME/.config/Ultralytics/settings.yaml)``` and change ```datasets_dir``` to project root path.
 
-2. Download prepared yolo-format D4LA and doclaynet data from below and put to ```./layout_data```:
+2. Download prepared yolo-format D4LA and DocLayNet data from below and put to ```./layout_data```:
 
 | Dataset | Download |
 |:--:|:--:|

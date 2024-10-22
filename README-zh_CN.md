@@ -5,7 +5,7 @@
 
 <h1>DocLayout-YOLO: Enhancing Document Layout Analysis through Diverse Synthetic Data and Global-to-Local Adaptive Perception</h1>
 
-欢迎来到[DocLayout-YOLO](https://arxiv.org/abs/2410.12628)官方仓库，适用于多种实际类型文档的文档版面分析工具
+欢迎来到[DocLayout-YOLO](https://arxiv.org/abs/2410.12628)官方仓库，针对多样性文档提供高质量布局检测能力。
 
 [![arXiv](https://img.shields.io/badge/arXiv-2405.14458-b31b1b.svg)](https://arxiv.org/abs/2410.12628) [![Online Demo](https://img.shields.io/badge/%F0%9F%A4%97-Online%20Demo-yellow)](https://huggingface.co/spaces/opendatalab/DocLayout-YOLO) [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97-Models%20and%20Data-yellow)](https://huggingface.co/collections/juliozhao/doclayout-yolo-670cdec674913d9a6f77b542)
 
@@ -14,7 +14,7 @@
 ## 摘要
 
 ```text
-我们提出DocLayout-YOLO，基于YOLO-v10，通过对文档预训练和模型结构进行优化，提高准确性的同时保持速度优势。文档预训练方面，我们提出Mesh-candidate BestFit，将文档合成视为二维装箱问题，生成了大规模多样化的合成文档数据集DocSynth-300K。模型结构优化方面，我们提出了Global-to-Local Controllable Receptive Module，能够更好地处理文档元素的多尺度变化。在下游数据集上实验表明，DocLayout-YOLO在速度和准确性方面都表现出色，并且可以适用于多种实际文档类型。
+我们提出DocLayout-YOLO的基于YOLO-v10，通过提供多样性文档预训练及适配文档检测的模型结构优化，可针对多样性文档进行实时鲁棒的检测。在文档预训练阶段，我们提出Mesh-candidate BestFit，将文档合成视为二维装箱问题，合成类型多样性的大规模合文档数据集DocSynth-300K。在模型结构优化方面，我们提出了全局到局部可控的感知模块，确保在尺度变化不一的文档元素上得到精准检测结果。
 ```
 
 <p align="center">

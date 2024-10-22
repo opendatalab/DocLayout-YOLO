@@ -14,7 +14,7 @@
 ## 摘要
 
 ```text
-我们提出DocLayout-YOLO的新方法，基于YOLO-v10，通过对文档预训练和模型结构进行优化，提高准确性的同时保持速度优势。文档预训练方面，我们提出Mesh-candidate BestFit，将文档合成视为二维装箱问题，生成了大规模多样化的合成文档数据集DocSynth-300K。模型结构优化方面，我们提出了Global-to-Local Controllable Receptive Module，能够更好地处理文档元素的多尺度变化。在下游数据集上实验表明，DocLayout-YOLO在速度和准确性方面都表现出色，并且可以适用于多种实际文档类型。
+我们提出DocLayout-YOLO，基于YOLO-v10，通过对文档预训练和模型结构进行优化，提高准确性的同时保持速度优势。文档预训练方面，我们提出Mesh-candidate BestFit，将文档合成视为二维装箱问题，生成了大规模多样化的合成文档数据集DocSynth-300K。模型结构优化方面，我们提出了Global-to-Local Controllable Receptive Module，能够更好地处理文档元素的多尺度变化。在下游数据集上实验表明，DocLayout-YOLO在速度和准确性方面都表现出色，并且可以适用于多种实际文档类型。
 ```
 
 <p align="center">
@@ -22,7 +22,7 @@
   <img src="assets/radar.png" width=44%> <br>
 </p>
 
-## News 🚀🚀🚀
+## 新闻 🚀🚀🚀
 
 **2024.10.21** 🎉🎉  在线演示上线[🤗Huggingface](https://huggingface.co/spaces/opendatalab/DocLayout-YOLO)。
 
@@ -33,7 +33,7 @@
 
 ## 快速使用
 
-[在线演示](https://huggingface.co/spaces/opendatalab/DocLayout-YOLO)目前可以使用。 对于本地开发部署，参考以下步骤:
+[在线演示](https://huggingface.co/spaces/opendatalab/DocLayout-YOLO)目前已经上线。 对于本地开发部署，参考以下步骤:
 
 ### 1. 环境配置
 
@@ -88,14 +88,14 @@ pip install doclayout-yolo
   ```
 
 
-请使用在 **DocStructBench** 上微调的模型来进行推理, **可以适用于实际场景中多种类型文档**. 模型下载地址在 [链接](https://huggingface.co/juliozhao/DocLayout-YOLO-DocStructBench/tree/main)， 示例图像路径为 ```assets/example```。
+请使用在 **DocStructBench** 上微调的模型来进行推理, **可以适用于实际场景中多种类型文档**。模型下载地址在[链接](https://huggingface.co/juliozhao/DocLayout-YOLO-DocStructBench/tree/main)， 示例图像路径为 ```assets/example```。
 
 <p align="center">
   <img src="assets/showcase.png" width=100%> <br>
 </p>
 
 
-**注意:** 对于PDF或者文档内容提取，请参考[PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit/tree/main)和[MinerU](https://github.com/opendatalab/MinerU).
+**注意:** 对于PDF或者文档内容提取，请参考[PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit/tree/main)和[MinerU](https://github.com/opendatalab/MinerU)。
 
 **注意:** DocLayout-YOLO 现在支持直接从 🤗Huggingface 进行调用, 加载模型示例如下:
 
@@ -118,7 +118,7 @@ model = YOLOv10.from_pretrained("juliozhao/DocLayout-YOLO-DocStructBench")
 
 1. 指定数据根目录
 
-找到```ultralytics```配置文件 (对于Linux用户配置文件在 ```$HOME/.config/Ultralytics/settings.yaml)```， 将```datasets_dir```改成项目根目录.
+找到```ultralytics```配置文件 (对于Linux用户配置文件在 ```$HOME/.config/Ultralytics/settings.yaml)```， 将```datasets_dir```改成项目根目录。
 
 2. 下载整理好的YOLO格式D4LA以及DocLayNet数据， 放置在路径```./layout_data```并且解压缩:
 
@@ -154,7 +154,7 @@ model = YOLOv10.from_pretrained("juliozhao/DocLayout-YOLO-DocStructBench")
 | DocLayNet | DocLayout-YOLO | &cross; | 1120 | 0.02 | [命令](assets/script.sh#L14) | [命令](assets/script.sh#L20) | 93.0 | 77.7 | [权重](https://huggingface.co/juliozhao/DocLayout-YOLO-DocLayNet-from_scratch) |
 | DocLayNet | DocLayout-YOLO | &check; | 1120 | 0.02 | [命令](assets/script.sh#L17) | [命令](assets/script.sh#L20) | 93.4 | 79.7 | [权重](https://huggingface.co/juliozhao/DocLayout-YOLO-DocLayNet-Docsynth300K_pretrained) |
 
-使用DocSynth300K预训练过的预训练模型可以从这里下载[链接](https://huggingface.co/juliozhao/DocLayout-YOLO-DocSynth300K-pretrain). 验证时，将命令中的 ```checkpoint.pt``` 改成需要验证的模型。
+使用DocSynth300K预训练过的预训练模型可以从[这里](https://huggingface.co/juliozhao/DocLayout-YOLO-DocSynth300K-pretrain)进行下载。 验证时，将命令中的 ```checkpoint.pt``` 改成需要验证的模型。
 
 
 ## 致谢

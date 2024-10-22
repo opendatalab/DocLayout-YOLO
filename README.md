@@ -13,9 +13,8 @@ Official PyTorch implementation of [DocLayout-YOLO](https://arxiv.org/abs/2410.1
     
 ## Abstract
 
-```text
-We introduce DocLayout-YOLO, based on YOLO-v10, a novel approach that enhances accuracy while maintaining speed advantages through document-specific optimizations in both pre-training and model design. For robust document pre-training, we introduce the Mesh-candidate BestFit algorithm, which frames document synthesis as a two-dimensional bin packing problem, generating the large-scale, diverse DocSynth-300K dataset. For model optimization, we propose a Global-to-Local Controllable Receptive Module that is capable of better handling multi-scale variations of document elements. Extensive experiments on downstream datasets demonstrate that DocLayout-YOLO excels in both speed and accuracy, and can be adapted to various real-world document types. 
-```
+> We present DocLayout-YOLO, a real-time and robust layout detection model for diverse documents, based on YOLO-v10. This model is enriched with diversified document pre-training and structural optimization tailored for layout detection. In the pre-training phase, we introduce Mesh-candidate BestFit, viewing document synthesis as a two-dimensional bin packing problem, and create a large-scale diverse synthetic document dataset, DocSynth-300K. In terms of model structural optimization, we propose a module with Global-to-Local Controllability for precise detection of document elements across varying scales. 
+
 
 <p align="center">
   <img src="assets/comp.png" width=52%>

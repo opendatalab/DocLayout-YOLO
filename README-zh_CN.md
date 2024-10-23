@@ -23,9 +23,11 @@
 
 ## 新闻 🚀🚀🚀
 
-**2024.10.21** 🎉🎉  在线演示上线[🤗Huggingface](https://huggingface.co/spaces/opendatalab/DocLayout-YOLO)。
+**2024.10.23** 🎉🎉  **DocSynth300K数据集** 现在已经上线 [🤗Huggingface](https://huggingface.co/datasets/juliozhao/DocSynth300K), DocSynth300K是一个多样性大规模文档布局检测预训练合成数据集，和from scratch训练相比可以大幅提升下游微调性能。
 
-**2024.10.18** 🎉🎉  DocLayout-YOLO接入文档内容提取工具包[PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit)。
+**2024.10.21** 🎉🎉  **在线演示**上线[🤗Huggingface](https://huggingface.co/spaces/opendatalab/DocLayout-YOLO)。
+
+**2024.10.18** 🎉🎉  DocLayout-YOLO接入文档内容提取工具包**[PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit)**。
 
 **2024.10.16** 🎉🎉  论文上线[ArXiv](https://arxiv.org/abs/2410.12628)。  
 
@@ -96,7 +98,7 @@ pip install doclayout-yolo
 
 **注意:** 对于PDF或者文档内容提取，请参考[PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit/tree/main)和[MinerU](https://github.com/opendatalab/MinerU)。
 
-**注意:** DocLayout-YOLO 现在支持直接从 🤗Huggingface 进行调用, 加载模型示例如下:
+**注意:** 感谢[NielsRogge](https://github.com/NielsRogge)，DocLayout-YOLO 现在支持直接从 🤗Huggingface 进行调用, 加载模型示例如下:
 
 ```python
 filepath = hf_hub_download(repo_id="juliozhao/DocLayout-YOLO-DocStructBench", filename="doclayout_yolo_docstructbench_imgsz1024.pt")
@@ -110,6 +112,39 @@ model = YOLOv10.from_pretrained("juliozhao/DocLayout-YOLO-DocStructBench")
 ```
 
 更多相关细节可以在这个[PR](https://github.com/opendatalab/DocLayout-YOLO/pull/6)进行查看。
+
+**注意:** 感谢[luciaganlulu](https://github.com/luciaganlulu)，DocLayout-YOLO可以进行batch推理。具体来说，在```model.predict```的```demo.py```函数中传入**图像路径的列表**，而不是单张图像，除此之外由于```YOLOv11```之前版本不支持batch推理，需要手动修改[此处](doclayout_yolo/engine/model.py#L431)的```batch_size```值。
+
+## DocSynth300K数据集
+
+<p align="center">
+  <img src="assets/docsynth300k.png" width=100%>
+</p>
+
+### 数据下载
+
+使用以下指令下载数据集（约113G）:
+
+```python
+from huggingface_hub import snapshot_download
+# Download DocSynth300K
+snapshot_download(repo_id="juliozhao/DocSynth300K", local_dir="./docsynth300k-hf", repo_type="dataset")
+# If the download was disrupted and the file is not complete, you can resume the download
+snapshot_download(repo_id="juliozhao/DocSynth300K", local_dir="./docsynth300k-hf", repo_type="dataset", resume_download=True)
+```
+
+### 数据准备 & 预训练
+
+如果想要进行DocSynth300K预训练, 首先使用 ```format_docsynth300k.py``` 将原始数据集的 ```.parquet``` 格式转换成 ```YOLO``` 格式. 格式转换后的数据存储在 ```./layout_data/docsynth300k```。
+
+```bash
+python format_docsynth300k.py
+```
+
+使用此处 [命令](assets/script.sh#L2) 来进行DocSynth300K预训练。 默认使用8张GPU进行训练。 为了达到最好的性能, 可以通过调整预训练超参数例如 ```imgsz``` 以及 ```lr```， 根据下游微调数据集的分布或者训练设置来调整。
+
+**注意:** 由于YOLO代码库数据加载存在内存泄漏问题，大数据集训练有可能会出现不明原因中断，可以通过 ```--pretrain 上一个检查点.pt --resume``` 来接续预训练
+
 
 ## 公开文档版面分析（DLA）数据集训练验证
 

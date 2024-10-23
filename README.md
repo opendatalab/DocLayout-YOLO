@@ -23,11 +23,13 @@ Official PyTorch implementation of [DocLayout-YOLO](https://arxiv.org/abs/2410.1
 
 ## News 🚀🚀🚀
 
-**2024.10.21** 🎉🎉  Online demo available on [🤗Huggingface](https://huggingface.co/spaces/opendatalab/DocLayout-YOLO).
+**2024.10.23** 🎉🎉  **DocSynth300K dataset** is released on [🤗Huggingface](https://huggingface.co/datasets/juliozhao/DocSynth300K), DocSynth300K is a large-scale and diverse document layout analysis pre-training dataset, which can largely boost model performance.
 
-**2024.10.18** 🎉🎉  DocLayout-YOLO is implemented in [PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit) for document context extraction.
+**2024.10.21** 🎉🎉  **Online demo** available on [🤗Huggingface](https://huggingface.co/spaces/opendatalab/DocLayout-YOLO).
 
-**2024.10.16** 🎉🎉  Paper now available on [ArXiv](https://arxiv.org/abs/2410.12628).   
+**2024.10.18** 🎉🎉  DocLayout-YOLO is implemented in **[PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit)** for document context extraction.
+
+**2024.10.16** 🎉🎉  **Paper** now available on [ArXiv](https://arxiv.org/abs/2410.12628).   
 
 
 ## Quick Start
@@ -96,7 +98,7 @@ We provide model fine-tuned on **DocStructBench** for prediction, **which is cap
 
 **Note:** For PDF content extraction, please refer to [PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit/tree/main) and [MinerU](https://github.com/opendatalab/MinerU).
 
-**Note:** Thanks to [Neils](https://github.com/NielsRogge), DocLayout-YOLO now supports implementation directly from 🤗Huggingface, you can load model as follows:
+**Note:** Thanks to [NielsRogge](https://github.com/NielsRogge), DocLayout-YOLO now supports implementation directly from 🤗Huggingface, you can load model as follows:
 
 ```python
 filepath = hf_hub_download(repo_id="juliozhao/DocLayout-YOLO-DocStructBench", filename="doclayout_yolo_docstructbench_imgsz1024.pt")
@@ -110,6 +112,38 @@ model = YOLOv10.from_pretrained("juliozhao/DocLayout-YOLO-DocStructBench")
 ```
 
 more details can be found at [this PR](https://github.com/opendatalab/DocLayout-YOLO/pull/6).
+
+**Note:** Thanks to [luciaganlulu](https://github.com/luciaganlulu), DocLayout-YOLO can perform batch inference and prediction. Instead of passing single image into ```model.predict``` in ```demo.py```, pass a **list of image path**. Besides, due to batch inference is not implemented before ```YOLOv11```, you should manually change ```batch_size``` in [here](doclayout_yolo/engine/model.py#L431).
+
+## DocSynth300K Dataset
+
+<p align="center">
+  <img src="assets/docsynth300k.png" width=100%>
+</p>
+
+### Data Download
+
+Use following command to download dataset(about 113G):
+
+```python
+from huggingface_hub import snapshot_download
+# Download DocSynth300K
+snapshot_download(repo_id="juliozhao/DocSynth300K", local_dir="./docsynth300k-hf", repo_type="dataset")
+# If the download was disrupted and the file is not complete, you can resume the download
+snapshot_download(repo_id="juliozhao/DocSynth300K", local_dir="./docsynth300k-hf", repo_type="dataset", resume_download=True)
+```
+
+### Data Formatting & Pre-training
+
+If you want to perform DocSynth300K pretraining, using ```format_docsynth300k.py``` to convert original ```.parquet``` format into ```YOLO``` format. The converted data will be stored at ```./layout_data/docsynth300k```.
+
+```bash
+python format_docsynth300k.py
+```
+
+To perform DocSynth300K pre-training, use this [command](assets/script.sh#L2). We default use 8GPUs to perform pretraining. To reach optimal performance, you can adjust hyper-parameters such as ```imgsz```, ```lr``` according to your downstream fine-tuning data distribution or setting.
+
+**Note:** Due to memory leakage in YOLO original data loading code, the pretraining on large-scale dataset may be interrupted unexpectedly, use ```--pretrain last_checkpoint.pt --resume``` to resume the pretraining process.
 
 ## Training and Evaluation on Public DLA Datasets
 

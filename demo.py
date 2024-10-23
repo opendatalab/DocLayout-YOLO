@@ -31,6 +31,6 @@ if __name__ == "__main__":
     annotated_frame = det_res[0].plot(pil=True, line_width=args.line_width, font_size=args.font_size)
     if not os.path.exists(args.res_path):
         os.makedirs(args.res_path)
-    output_path = os.path.join(args.res_path, args.image_path.split("/")[-1].replace(".png", "_res.png"))
+    output_path = os.path.join(args.res_path, args.image_path.split("/")[-1].replace(".jpg", "_res.jpg"))
     cv2.imwrite(output_path, annotated_frame)
     print(f"Result saved to {output_path}")

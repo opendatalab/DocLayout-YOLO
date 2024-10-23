@@ -113,7 +113,7 @@ model = YOLOv10.from_pretrained("juliozhao/DocLayout-YOLO-DocStructBench")
 
 更多相关细节可以在这个[PR](https://github.com/opendatalab/DocLayout-YOLO/pull/6)进行查看。
 
-**注意:** 感谢[luciaganlulu](https://github.com/luciaganlulu)，DocLayout-YOLO可以进行batch推理。具体来说，在```model.predict```的```demo.py```函数中传入**图像路径的列表**，而不是单张图像，除此之外由于```YOLOv11```之前版本不支持batch推理，需要手动修改[此处](doclayout_yolo/engine/model.py.sh#L431)的```batch_size```值。
+**注意:** 感谢[luciaganlulu](https://github.com/luciaganlulu)，DocLayout-YOLO可以进行batch推理。具体来说，在```model.predict```的```demo.py```函数中传入**图像路径的列表**，而不是单张图像，除此之外由于```YOLOv11```之前版本不支持batch推理，需要手动修改[此处](doclayout_yolo/engine/model.py#L431)的```batch_size```值。
 
 ## DocSynth300K数据集
 
@@ -123,7 +123,7 @@ model = YOLOv10.from_pretrained("juliozhao/DocLayout-YOLO-DocStructBench")
 
 ### 数据下载
 
-使用以下指令下载数据集:
+使用以下指令下载数据集（约113G）:
 
 ```python
 from huggingface_hub import snapshot_download

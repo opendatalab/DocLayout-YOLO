@@ -113,7 +113,7 @@ model = YOLOv10.from_pretrained("juliozhao/DocLayout-YOLO-DocStructBench")
 
 more details can be found at [this PR](https://github.com/opendatalab/DocLayout-YOLO/pull/6).
 
-**Note:** Thanks to [luciaganlulu](https://github.com/luciaganlulu), DocLayout-YOLO can perform batch inference and prediction. Instead of passing single image into ```model.predict``` in ```demo.py```, pass a **list of image path**. Besides, due to batch inference is not implemented before ```YOLOv11```, you should manually change ```batch_size``` in [here](doclayout_yolo/engine/model.py.sh#L431).
+**Note:** Thanks to [luciaganlulu](https://github.com/luciaganlulu), DocLayout-YOLO can perform batch inference and prediction. Instead of passing single image into ```model.predict``` in ```demo.py```, pass a **list of image path**. Besides, due to batch inference is not implemented before ```YOLOv11```, you should manually change ```batch_size``` in [here](doclayout_yolo/engine/model.py#L431).
 
 ## DocSynth300K Dataset
 
@@ -123,7 +123,7 @@ more details can be found at [this PR](https://github.com/opendatalab/DocLayout-
 
 ### Data Download
 
-Use following command to download dataset:
+Use following command to download dataset(about 113G):
 
 ```python
 from huggingface_hub import snapshot_download

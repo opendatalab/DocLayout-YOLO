@@ -2,6 +2,7 @@
 
 <p align="center">
   <img src="../assets/Mesh-candidate Bestfit.png" width=100%> <br>
+  <i><small>Mesh-candidate Bestfit iteratively inserts elements from a small set of public datasets by searching for the best match between sampled candidates and the available grids in the current layout, ultimately achieving document synthesis.</i>
 </p>
 
 You can generate a large scale of diverse data for pretraining applying our proposed method Mesh-candidate Bestfit, just follow steps below:
@@ -21,13 +22,13 @@ pip install pymupdf==1.23.7
 
   Two primary things need to be well prepared before starting generation: 
 
-  1. Original annotation file of your dataset
+  1\. **Original Annotation File of Your Dataset**<br>
 
-    - It must be a json following COCO format.
-    - Each instance has a unique instance id.
-    - It should be placed under `./` folder
+      * The file must be in **JSON format** and follow the **COCO** specification.
+      * Each instance should have a **unique instance ID**.
+      * The file should be placed in the `./` directory.<br>
 
-  2. Element Pool
+  2\. **Element Pool**
 
   You can easily extract elements of different categories based on the original annotation file. However, it is required to be structured like this:
 
@@ -46,7 +47,7 @@ pip install pymupdf==1.23.7
   └── ...
   ```
 
-  The first-level subdirectories are named after the specific categories, and the elements inside are named with corresponding instance ids in the raw json file of the dataset. 
+  The first-level subdirectories are named after the **specific categories**, and the elements inside are named with **corresponding instance IDs** in the raw json file of the dataset. 
 
   **Note:** For convenience, we provide original annotation file and element pool for M6Doc dataset, which can be downloaded from [annotation file](https://drive.google.com/file/d/1ua41Gs3UW8iuoJp21tZ4-lczVrcEm-gP/view?usp=sharing) and [element pool](https://drive.google.com/file/d/1MrIFObKr1bDGgZLBQM_c_Dvobkp6mjFE/view?usp=sharing), respectively.
 

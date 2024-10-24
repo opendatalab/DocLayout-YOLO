@@ -15,7 +15,7 @@ cd pretraining_data_generation
 pip install pymupdf==1.23.7
 ```
 
-### 2. Dataset Preparing
+### 2. Dataset Preparation
 
 Taking M6Doc dataset as an example, the required file structure of element pool is as follows. The first-level subdirectories are named after the specific categories, and the elements inside are named with corresponding annotation ids in the raw json file of the dataset. Organized M6Doc element pool can be downloaded from [Google drive](https://drive.google.com/file/d/1MrIFObKr1bDGgZLBQM_c_Dvobkp6mjFE/view?usp=sharing).
 

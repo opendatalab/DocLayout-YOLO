@@ -27,7 +27,7 @@ def bestfit_generator(element_all):
     small_elements_idx = random.sample(list(range(len(element_all['small']))), int(candidate_num*0.01))
     cand_elements = [element_all['large'][large_idx] for large_idx in large_elements_idx] + [element_all['small'][small_idx] for small_idx in small_elements_idx]
 
-    # Initially, random put an element
+    # Initially, randomly put an element
     put_elements = []
     e0 = random.choice(cand_elements)
     cx = random.uniform(min(e0.w/2, 1-e0.w/2), max(e0.w/2, 1-e0.w/2))

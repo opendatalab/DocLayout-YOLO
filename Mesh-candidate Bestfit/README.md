@@ -22,14 +22,14 @@ pip install pymupdf==1.23.7
 
   Two primary things need to be well prepared before starting generation: 
 
-  1\. **Original Annotation File of Your Dataset**<br>
+  1\. **Original Annotation File of Your Dataset**   
 
-      * The file must be in **JSON format** and follow the **COCO** specification.
-      * Each instance should have a **unique instance ID**.
-      * The file should be placed in the `./` directory.<br>
+     * The file must be in **JSON format** and follow the **COCO** specification.
+     * Each instance should have a **unique instance ID**.
+     * The file should be placed in the `./` directory.   
 
-  2\. **Element Pool**
-
+  2\. **Element Pool**  
+  
   You can easily extract elements of different categories based on the original annotation file. However, it is required to be structured like this:
 
   ```bash

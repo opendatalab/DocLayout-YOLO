@@ -62,7 +62,7 @@ pip install pymupdf==1.23.7
   python augmentation.py --min_count 100 --aug_times 3
   ```
 
-  The script will perform augmentation pipeline `aug_times` times on each element of categories whose element number is less than `min_count`. If you want to generate large amount of data, try larger `aug_times`. In contrast, you want to shorten this process, try smaller `aug_times`.
+  The script will perform augmentation pipeline `aug_times` times on each element of categories whose element number is less than `min_count`. If you want to generate large amount of data, try larger `aug_times`. In contrast, you want to shorten this process, try smaller `aug_times`. During DocSynth300K generation, we use ```--aug_times 50```.
 
 - **Map Dict**
 

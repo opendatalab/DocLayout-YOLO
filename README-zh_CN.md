@@ -23,6 +23,8 @@
 
 ## 新闻 🚀🚀🚀
 
+**2024.10.25** 🎉🎉  **[Mesh-candidate Bestfit](./mesh-candidate_bestfit)** 代码已经部署, Mesh-candidate Bestfit是一个自动化文档布局检测数据生成框架，可以生成大量多样性文档布局分析数据。
+
 **2024.10.23** 🎉🎉  **DocSynth300K数据集** 现在已经上线 [🤗Huggingface](https://huggingface.co/datasets/juliozhao/DocSynth300K), DocSynth300K是一个多样性大规模文档布局检测预训练合成数据集，和from scratch训练相比可以大幅提升下游微调性能。
 
 **2024.10.21** 🎉🎉  **在线演示**上线[🤗Huggingface](https://huggingface.co/spaces/opendatalab/DocLayout-YOLO)。

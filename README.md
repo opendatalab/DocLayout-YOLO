@@ -23,6 +23,8 @@ Official PyTorch implementation of [DocLayout-YOLO](https://arxiv.org/abs/2410.1
 
 ## News 🚀🚀🚀
 
+**2024.10.25** 🎉🎉  **[Mesh-candidate Bestfit](./mesh-candidate_bestfit)** is released. Mesh-candidate Bestfit is a automatic pipeline which can generate large-scale and diverse document document layout detection dataset.
+
 **2024.10.23** 🎉🎉  **DocSynth300K dataset** is released on [🤗Huggingface](https://huggingface.co/datasets/juliozhao/DocSynth300K), DocSynth300K is a large-scale and diverse document layout analysis pre-training dataset, which can largely boost model performance.
 
 **2024.10.21** 🎉🎉  **Online demo** available on [🤗Huggingface](https://huggingface.co/spaces/opendatalab/DocLayout-YOLO).

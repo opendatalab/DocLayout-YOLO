@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
     for category in tqdm(os.listdir(root_dir),desc='Categories done'):
         category_dir = os.path.join(root_dir,category)
-        if len(os.listdir(category_dir)) <= args.min_count:
+        if len(os.listdir(category_dir)) > args.min_count:
             continue
         else:
             save_dir = os.path.join(category_dir, 'aug')

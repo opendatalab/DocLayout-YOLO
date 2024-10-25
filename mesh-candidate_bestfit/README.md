@@ -1,4 +1,4 @@
-## Mesh-candidate Bestfit
+## Pretraining Data Generation via Mesh-candidate Bestfit
 
 <p align="center">
   <img src="../assets/Mesh-candidate Bestfit.png" width=100%> <br>
@@ -12,7 +12,7 @@ You can generate a large scale of diverse data for pretraining applying our prop
 You need to install [PyMuPDF](https://pypi.org/project/PyMuPDF/1.23.7/) for subsequent rendering via pip:
 
 ```bash
-cd "Mesh-candidate Bestfit"
+cd mesh-candidate_bestfit
 pip install pymupdf==1.23.7
 ```
 
@@ -49,7 +49,12 @@ pip install pymupdf==1.23.7
 
   The first-level subdirectories are named after the **specific categories**, and the elements inside are named with **corresponding instance IDs** in the raw json file of the dataset. 
 
-  **Note:** For convenience, we provide original annotation file and element pool for M6Doc dataset, which can be downloaded from [annotation file](https://drive.google.com/file/d/1ua41Gs3UW8iuoJp21tZ4-lczVrcEm-gP/view?usp=sharing) and [element pool](https://drive.google.com/file/d/1MrIFObKr1bDGgZLBQM_c_Dvobkp6mjFE/view?usp=sharing), respectively.
+  **Note:** For convenience, we provide original annotation file and element pool for M6Doc dataset, which can be downloaded from [annotation file](https://drive.google.com/file/d/1ua41Gs3UW8iuoJp21tZ4-lczVrcEm-gP/view?usp=sharing) and [element pool](https://drive.google.com/file/d/1MrIFObKr1bDGgZLBQM_c_Dvobkp6mjFE/view?usp=sharing), respectively. And you can run the script below to decompress the element pool file properly:
+
+  ```bash
+  unzip /path/to/your/element_pool.zip -d ./element_pool/
+  ```
+
 
 - **Data Augmentation(Optional)**
 

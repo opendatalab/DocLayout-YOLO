@@ -72,14 +72,12 @@ if __name__ == "__main__":
 
     for category in tqdm(os.listdir(root_dir),desc='Categories done'):
         category_dir = os.path.join(root_dir,category)
-        if os.listdir(category_dir) <= args.min_count:
+        if len(os.listdir(category_dir)) <= args.min_count:
             continue
         else:
             save_dir = os.path.join(category_dir, 'aug')
-            os.makedirs(save_dir, exist_ok=True)
             for raw_element in os.listdir(category_dir):
                 raw_element_path = os.path.join(category_dir, raw_element)
-               
                 img = cv2.imread(raw_element_path)
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                 h, w, c = img.shape

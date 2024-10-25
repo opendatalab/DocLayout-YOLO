@@ -124,6 +124,7 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser()
     parser.add_argument('--generate_num', default=None, required=True, type=int, help='number of layouts to generate')
+    parser.add_argument('--n_jobs', default=None, required=True, type=int, help='number of processes to use in multiprocessing')
     parser.add_argument('--json_path', default=None, required=True, type=str, help='original json file of the dataset')
     parser.add_argument('--output_dir', default='./generated_layouts/seperate', type=str, help='output directory of generated seperate layouts')
     args = parser.parse_args()
@@ -133,7 +134,7 @@ if __name__ == "__main__":
     os.makedirs(OUTPUT_DIR,exist_ok=True)
 
     # Using multiprocessing to accelerate generation
-    n_jobs = 100
+    n_jobs = args.n_jobs
     with multiprocessing.Pool(n_jobs) as p:
         generated_layout = p.starmap(
             bestfit_generator, [(element_all,) for _ in range(args.generate_num)]

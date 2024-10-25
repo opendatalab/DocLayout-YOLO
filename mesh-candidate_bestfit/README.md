@@ -22,15 +22,15 @@ pip install pymupdf==1.23.7
 
   Two primary things need to be well prepared before starting generation: 
 
-  1\. **Original Annotation File of Your Dataset**   
+  1\. **Original Annotation File of Initial Dataset**   
 
-     * The file must be in **JSON format** and follow the **COCO** specification.
-     * Each instance should have a **unique instance ID**.
-     * The file should be placed in the `./` directory.   
+     * The annotation file follows **COCO format**, a **JSON file** contains images and instances annotations.
+     * Each instance should have a **unique** ```instance_id```.
+     * The file should be placed under `./`.   
 
   2\. **Element Pool**  
   
-  You can easily extract elements of different categories based on the original annotation file. However, it is required to be structured like this:
+  Element Pool is constructed according to annotation file. Specifically, crop all the instances images and organize them in a category-wise manner. The structure of element pool is as follows (folder is named by each category and cropped image is named by unique ```instance_id```):
 
   ```bash
   ./element_pool
@@ -47,9 +47,7 @@ pip install pymupdf==1.23.7
   └── ...
   ```
 
-  The first-level subdirectories are named after the **specific categories**, and the elements inside are named with **corresponding instance IDs** in the raw json file of the dataset. 
-
-  **Note:** For convenience, we provide original annotation file and element pool for M6Doc dataset, which can be downloaded from [annotation file](https://drive.google.com/file/d/1ua41Gs3UW8iuoJp21tZ4-lczVrcEm-gP/view?usp=sharing) and [element pool](https://drive.google.com/file/d/1MrIFObKr1bDGgZLBQM_c_Dvobkp6mjFE/view?usp=sharing), respectively. And you can run the script below to decompress the element pool file properly:
+  **Note:** For convenience, we provide original annotation file and element pool for M6Doc-test dataset, which can be downloaded from [annotation file](https://drive.google.com/file/d/1ua41Gs3UW8iuoJp21tZ4-lczVrcEm-gP/view?usp=sharing) and [element pool](https://drive.google.com/file/d/1MrIFObKr1bDGgZLBQM_c_Dvobkp6mjFE/view?usp=sharing), respectively. And you can run the script below to decompress the element pool properly:
 
   ```bash
   unzip /path/to/your/element_pool.zip -d ./element_pool/
@@ -61,14 +59,14 @@ pip install pymupdf==1.23.7
   If you want to apply our designed augmentation pipeline to your element pool, you can just run:
 
   ```bash
-  python augmentation.py --min_count 100 --aug_times 50
+  python augmentation.py --min_count 100 --aug_times 3
   ```
 
-  The script will perform augmentation pipeline `aug_times` times on each element of categories whose element number is less than `min_count`.
+  The script will perform augmentation pipeline `aug_times` times on each element of categories whose element number is less than `min_count`. If you want to generate large amount of data, try larger `aug_times`. In contrast, you want to shorten this process, try smaller `aug_times`.
 
 - **Map Dict**
 
-  To facilitate the random selection of candidates during the rendering phase, it is necessary to establish a mapping from elements to all of their candidate paths:
+  To facilitate the random selection of candidates during the rendering phase, it is necessary to establish a mapping from candidate elements to all of their candidate paths (passing ```--use_aug``` is augmentation is implemented):
 
   ```bash
   python map_dict.py --save_path ./map_dict.json --use_aug
@@ -79,18 +77,20 @@ pip install pymupdf==1.23.7
 Now, you can generate diverse layouts using Mesh-candidate Bestfit algorithm. To prevent process blocking, it will save the result of each layout in a timely manner, but you can use the [combine_layouts.py](./combine_layouts.py) script to combine them all together like this:
 
 ```bash
-python bestfit_generator.py --generate_num 10000 --json_path ./M6Doc.json --output_dir ./generated_layouts/seperate
-python combine_layouts.py --seperate_layouts_dir ./generate_layouts/seperate --save_path ./generate_layouts/combined_layouts.json
+python bestfit_generator.py --generate_num 100 --n_jobs 5 --json_path ./annotation_file.json --output_dir ./generated_layouts/seperate
+python combine_layouts.py --seperate_layouts_dir ./generated_layouts/seperate --save_path ./generated_layouts/combined_layouts.json
 ```
 
 Afterwards, feel free to delete the seperate layouts since they are no longer used.
 
+**Note:** Due to multiprocessing used in layout generation, set proper ```--n_jobs``` to avoid process blocking.
+    
 ### 4. Rendering
 
 Finally, you can render generated layouts and save the results in yolo format via the script below:
 
 ```bash
-python rendering.py --json_path ./generate_layouts/combined_layouts.json --map_dict_path ./map_dict.json --save_dir ./generated_dataset 
+python rendering.py --json_path ./generated_layouts/combined_layouts.json --n_jobs 5 --map_dict_path ./map_dict.json --save_dir ./generated_dataset 
 ```
 
 ### Visualization

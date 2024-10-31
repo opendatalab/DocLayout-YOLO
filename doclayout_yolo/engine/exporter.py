@@ -223,7 +223,7 @@ class Exporter:
             p.requires_grad = False
         model.eval()
         model.float()
-        model = model.fuse()
+        # model = model.fuse()
         for m in model.modules():
             if isinstance(m, (Detect, RTDETRDecoder)):  # includes all Detect subclasses like Segment, Pose, OBB
                 m.dynamic = self.args.dynamic
@@ -237,6 +237,7 @@ class Exporter:
                 m.forward = m.forward_split
 
         y = None
+        
         for _ in range(2):
             y = model(im)  # dry runs
         if self.args.half and onnx and self.device.type != "cpu":

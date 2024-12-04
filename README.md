@@ -198,6 +198,29 @@ The code base is built with [ultralytics](https://github.com/ultralytics/ultraly
 
 Thanks for their great work!
 
+## Star History
+
+If you find our project useful, please add a "star" to the repo. It's exciting to us when we see your interest, which keep us motivated to continue investing in the project!
+
+<picture>
+  <source
+    media="(prefers-color-scheme: dark)"
+    srcset="
+      https://api.star-history.com/svg?repos=opendatalab/DocLayout-YOLO&type=Date&theme=dark
+    "
+  />
+  <source
+    media="(prefers-color-scheme: light)"
+    srcset="
+      https://api.star-history.com/svg?repos=opendatalab/DocLayout-YOLO&type=Date
+    "
+  />
+  <img
+    alt="Star History Chart"
+    src="https://api.star-history.com/svg?repos=opendatalab/DocLayout-YOLO&type=Date"
+  />
+</picture>
+
 ## Citation
 
 ```bibtex

@@ -79,6 +79,7 @@ dependencies = [
     "pandas>=1.1.4",
     "seaborn>=0.11.0", # plotting
     "albumentations>=1.4.11",
+    "huggingface_hub>=0.26.2",
 ]
 
 # Optional dependencies ------------------------------------------------------------------------------------------------

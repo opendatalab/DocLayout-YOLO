@@ -192,6 +192,28 @@ python format_docsynth300k.py
 
 使用DocSynth300K预训练过的预训练模型可以从[这里](https://huggingface.co/juliozhao/DocLayout-YOLO-DocSynth300K-pretrain)进行下载。 验证时，将命令中的 ```checkpoint.pt``` 改成需要验证的模型。
 
+## Star History
+
+如果我们的项目有帮助到您，请给本项目点赞！您的点赞是我们继续探索优化的动力。
+
+<picture>
+  <source
+    media="(prefers-color-scheme: dark)"
+    srcset="
+      https://api.star-history.com/svg?repos=opendatalab/DocLayout-YOLO&type=Date&theme=dark
+    "
+  />
+  <source
+    media="(prefers-color-scheme: light)"
+    srcset="
+      https://api.star-history.com/svg?repos=opendatalab/DocLayout-YOLO&type=Date
+    "
+  />
+  <img
+    alt="Star History Chart"
+    src="https://api.star-history.com/svg?repos=opendatalab/DocLayout-YOLO&type=Date"
+  />
+</picture>
 
 ## 致谢
 

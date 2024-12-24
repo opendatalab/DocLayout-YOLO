@@ -29,6 +29,7 @@ class LayoutParserTrainingSettings:
     device: str = "0"
     val_period: int = 1
     save_period: int = 10
+    plots: bool = False
 
     @property
     def local_ft_model_name(self) -> str:

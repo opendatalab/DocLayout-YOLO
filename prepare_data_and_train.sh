@@ -7,4 +7,4 @@ fi
 python prepare_data_for_training.py
 
 # Train the model
-python training_wrapper.py
+python training_wrapper.py --push

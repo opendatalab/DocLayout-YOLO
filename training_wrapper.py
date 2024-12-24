@@ -61,7 +61,10 @@ def push_to_hub(
 
     # Create repo if it doesn't exist
     try:
-        api.create_repo(repo_id=settings.pushed_model_repo, exist_ok=True, repo_type="model")
+        api.create_repo(repo_id=settings.pushed_model_repo, 
+                        exist_ok=True, 
+                        repo_type="model",
+                        private=True)
     except Exception as e:
         print(f"Repository creation failed: {e}")
         return
@@ -99,8 +102,7 @@ def main(settings: LayoutParserTrainingSettings, push: bool = False, commit_mess
             commit_message = args.commit_message or f"Model trained on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
             push_to_hub(
                 settings=settings,
-                commit_message=commit_message,
-                private=True,
+                commit_message=commit_message
             )
             logger.info(f"Model successfully pushed to {settings.pushed_model_repo}")
             

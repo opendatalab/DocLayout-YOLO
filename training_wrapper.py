@@ -37,7 +37,7 @@ def train_model(settings: LayoutParserTrainingSettings):
         batch=settings.batch_size,
         device=settings.device,
         workers=settings.workers,
-        plots=True,
+        plots=settings.plots,
         exist_ok=False,
         val=True,
         val_period=settings.val_period,
@@ -85,16 +85,7 @@ def push_to_hub(
         print(f"Upload failed: {e}")
 
 
-def main():
-    # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Train and optionally push YOLOv10 model')
-    parser.add_argument('--push', action='store_true', help='Push model to HuggingFace Hub after training')
-    parser.add_argument('--commit-message', type=str, 
-                       help='Custom commit message for model push (default: timestamp)')
-    args = parser.parse_args()
-    
-    # Initialize settings
-    settings = LayoutParserTrainingSettings()
+def main(settings: LayoutParserTrainingSettings, push: bool = False, commit_message: str = None):
     
     try:
         # Train model
@@ -108,7 +99,8 @@ def main():
             commit_message = args.commit_message or f"Model trained on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
             push_to_hub(
                 settings=settings,
-                commit_message=commit_message
+                commit_message=commit_message,
+                private=True,
             )
             logger.info(f"Model successfully pushed to {settings.pushed_model_repo}")
             
@@ -117,4 +109,12 @@ def main():
         raise
 
 if __name__ == "__main__":
-    main()
+
+    parser = argparse.ArgumentParser(description='Train and optionally push YOLOv10 model')
+    parser.add_argument('--push', action='store_true', help='Push model to HuggingFace Hub after training')
+    parser.add_argument('--commit-message', type=str, 
+                       help='Custom commit message for model push (default: timestamp)')
+    args = parser.parse_args()
+
+    settings = LayoutParserTrainingSettings()
+    main(settings, args.push, args.commit_message)

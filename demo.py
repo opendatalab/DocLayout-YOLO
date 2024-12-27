@@ -17,7 +17,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     # Automatically select device
-    device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.mps.is_available() else 'cpu'
+    device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
     print(f"Using device: {device}")
 
     model = YOLOv10(args.model)  # load an official model

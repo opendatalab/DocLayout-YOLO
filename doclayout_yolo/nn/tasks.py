@@ -730,7 +730,7 @@ def torch_safe_load(weight):
                 "doclayout_yolo.yolo.data": "doclayout_yolo.data",
             }
         ):  # for legacy 8.0 Classify and Pose models
-            ckpt = torch.load(file, map_location="cpu")
+            ckpt = torch.load(file, map_location="cpu", weights_only=False)
 
     except ModuleNotFoundError as e:  # e.name is missing module name
         if e.name == "models":

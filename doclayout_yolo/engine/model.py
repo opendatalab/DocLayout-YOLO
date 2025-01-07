@@ -390,20 +390,21 @@ class Model(nn.Module):
         source: Union[str, Path, int, list, tuple, np.ndarray, torch.Tensor] = None,
         stream: bool = False,
         predictor=None,
+        batch_size: int = 1,  
         **kwargs,
     ) -> list:
         """
-        Performs predictions on the given image source using the YOLO model.
+        Performs predictions on the given image source using the YOLO model.    
 
         This method facilitates the prediction process, allowing various configurations through keyword arguments.
         It supports predictions with custom predictors or the default predictor method. The method handles different
         types of image sources and can operate in a streaming mode. It also provides support for SAM-type models
-        through 'prompts'.
+        through 'prompts'.  
 
         The method sets up a new predictor if not already present and updates its arguments with each call.
         It also issues a warning and uses default assets if the 'source' is not provided. The method determines if it
         is being called from the command line interface and adjusts its behavior accordingly, including setting defaults
-        for confidence threshold and saving behavior.
+        for confidence threshold and saving behavior.   
 
         Args:
             source (str | int | PIL.Image | np.ndarray, optional): The source of the image for making predictions.
@@ -411,26 +412,27 @@ class Model(nn.Module):
             stream (bool, optional): Treats the input source as a continuous stream for predictions. Defaults to False.
             predictor (BasePredictor, optional): An instance of a custom predictor class for making predictions.
                 If None, the method uses a default predictor. Defaults to None.
+            batch (int, optional): Batch size for predictions. Defaults to 1.
             **kwargs (any): Additional keyword arguments for configuring the prediction process. These arguments allow
-                for further customization of the prediction behavior.
+                for further customization of the prediction behavior.   
 
         Returns:
-            (List[doclayout_yolo.engine.results.Results]): A list of prediction results, encapsulated in the Results class.
+            (List[doclayout_yolo.engine.results.Results]): A list of prediction results, encapsulated in the Results class. 
 
         Raises:
             AttributeError: If the predictor is not properly set up.
         """
         if source is None:
             source = ASSETS
-            LOGGER.warning(f"WARNING ⚠️ 'source' is missing. Using 'source={source}'.")
+            LOGGER.warning(f"WARNING ⚠️ 'source' is missing. Using 'source={source}'.") 
 
         is_cli = (sys.argv[0].endswith("yolo") or sys.argv[0].endswith("doclayout_yolo")) and any(
             x in sys.argv for x in ("predict", "track", "mode=predict", "mode=track")
-        )
+        )   
 
-        custom = {"conf": 0.25, "batch": 1, "save": is_cli, "mode": "predict"}  # method defaults
+        custom = {"conf": 0.25, "batch_size": batch_size, "save": is_cli, "mode": "predict"}  # method defaults, include batch
         args = {**self.overrides, **custom, **kwargs}  # highest priority args on the right
-        prompts = args.pop("prompts", None)  # for SAM-type models
+        prompts = args.pop("prompts", None)  # for SAM-type models  
 
         if not self.predictor:
             self.predictor = predictor or self._smart_load("predictor")(overrides=args, _callbacks=self.callbacks)

@@ -14,6 +14,7 @@ if __name__ == "__main__":
     parser.add_argument('--line-width', default=5, required=False, type=int)
     parser.add_argument('--font-size', default=20, required=False, type=int)
     parser.add_argument('--conf', default=0.2, required=False, type=float)
+    parser.add_argument('--batch_size', default=1, required=False, type=int)
     args = parser.parse_args()
     
     # Automatically select device
@@ -27,6 +28,7 @@ if __name__ == "__main__":
         imgsz=args.imgsz,
         conf=args.conf,
         device=device,
+        batch_size=args.batch_size
     )
     annotated_frame = det_res[0].plot(pil=True, line_width=args.line_width, font_size=args.font_size)
     if not os.path.exists(args.res_path):

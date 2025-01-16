@@ -14,6 +14,8 @@ def get_map_dict(use_aug):
     instance2pathlist = {}
     root_dir = './element_pool'
     for category in os.listdir(root_dir):
+        if category == '.DS_Store':
+            continue
         category_dir = os.path.join(root_dir,category)
         filelist = os.listdir(category_dir)
         for filename in tqdm(filelist):

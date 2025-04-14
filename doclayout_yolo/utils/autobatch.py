@@ -5,6 +5,7 @@ from copy import deepcopy
 
 import numpy as np
 import torch
+import torch.amp
 
 from doclayout_yolo.utils import DEFAULT_CFG, LOGGER, colorstr
 from doclayout_yolo.utils.torch_utils import profile
@@ -22,8 +23,7 @@ def check_train_batch_size(model, imgsz=640, amp=True):
     Returns:
         (int): Optimal batch size computed using the autobatch() function.
     """
-
-    with torch.cuda.amp.autocast(amp):
+    with torch.amp.autocast(device_type="cuda", enabled=amp):
         return autobatch(deepcopy(model).train(), imgsz)  # compute optimal batch size
 
 

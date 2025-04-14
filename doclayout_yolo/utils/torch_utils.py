@@ -462,6 +462,15 @@ class ModelEMA:
         if self.enabled:
             copy_attr(self.ema, model, include, exclude)
 
+def convert_to_fp16(model):
+    """Convert model to FP16 (half precision) and return original device."""
+    for layers in model.modules():
+        if isinstance(layers, (nn.BatchNorm2d, nn.BatchNorm1d, nn.SyncBatchNorm)):
+            try:
+                layers.half()
+            except Exception:
+                LOGGER.warning(f"Warning: layer {layers} not supported for FP16 conversion")
+    return model
 
 def strip_optimizer(f: Union[str, Path] = "best.pt", s: str = "") -> None:
     """
@@ -483,21 +492,23 @@ def strip_optimizer(f: Union[str, Path] = "best.pt", s: str = "") -> None:
             strip_optimizer(f)
         ```
     """
-    x = torch.load(f, map_location=torch.device("cpu"))
+    x = torch.load(f, map_location=torch.device("cpu"), weights_only=False)
     if "model" not in x:
         LOGGER.info(f"Skipping {f}, not a valid Ultralytics model.")
         return
 
-    if hasattr(x["model"], "args"):
-        x["model"].args = dict(x["model"].args)  # convert from IterableSimpleNamespace to dict
+    model = x["model"]
+    if hasattr(model, "args"):
+        model.args = dict(model.args)  # convert from IterableSimpleNamespace to dict
     args = {**DEFAULT_CFG_DICT, **x["train_args"]} if "train_args" in x else None  # combine args
     if x.get("ema"):
-        x["model"] = x["ema"]  # replace model with ema
-    for k in "optimizer", "best_fitness", "ema", "updates":  # keys
+        model = x["ema"]  # replace model with ema
+    for k in ["optimizer", "best_fitness", "ema", "updates"]:  # keys
         x[k] = None
     x["epoch"] = -1
-    x["model"].half()  # to FP16
-    for p in x["model"].parameters():
+    model = convert_to_fp16(model)  # to FP16
+    #x["model"].half()  # to FP16
+    for p in model.parameters():
         p.requires_grad = False
     x["train_args"] = {k: v for k, v in args.items() if k in DEFAULT_CFG_KEYS}  # strip non-default keys
     # x['model'].args = x['train_args']

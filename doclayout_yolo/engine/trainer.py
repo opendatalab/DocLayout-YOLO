@@ -19,6 +19,7 @@ import numpy as np
 import torch
 from torch import distributed as dist
 from torch import nn, optim
+import torch.amp
 
 from doclayout_yolo.cfg import get_cfg, get_save_dir
 from doclayout_yolo.data.utils import check_cls_dataset, check_det_dataset
@@ -226,7 +227,7 @@ class BaseTrainer:
         torch.cuda.set_device(RANK)
         self.device = torch.device("cuda", RANK)
         # LOGGER.info(f'DDP info: RANK {RANK}, WORLD_SIZE {world_size}, DEVICE {self.device}')
-        os.environ["NCCL_BLOCKING_WAIT"] = "1"  # set to enforce timeout
+        os.environ["TORCH_NCCL_BLOCKING_WAIT"] = "1"  # set to enforce timeout
         dist.init_process_group(
             backend="nccl" if dist.is_nccl_available() else "gloo",
             timeout=timedelta(seconds=32400),  # 3 hours
@@ -377,7 +378,7 @@ class BaseTrainer:
                             x["momentum"] = np.interp(ni, xi, [self.args.warmup_momentum, self.args.momentum])
 
                 # Forward
-                with torch.cuda.amp.autocast(self.amp):
+                with torch.amp.autocast(device_type="cuda", enabled=self.amp): #https://pytorch.org/docs/stable/amp.html#
                     batch = self.preprocess_batch(batch)
                     self.loss, self.loss_items = self.model(batch)
                     if RANK != -1:

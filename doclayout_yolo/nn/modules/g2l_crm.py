@@ -33,10 +33,15 @@ class DilatedBlock(nn.Module):
 
     def dilated_conv(self, x, dilation):
         act = self.dcv.act
-        bn = self.dcv.bn
         weight = self.dcv.conv.weight
         padding = dilation * (self.k//2)
-        return act(bn(F.conv2d(x, weight, stride=1, padding=padding, dilation=dilation)))
+        if hasattr(self.dcv, "bn") and self.dcv.bn is not None:
+            bn = self.dcv.bn
+            x = bn(F.conv2d(x, weight, stride=1, padding=padding, dilation=dilation))
+        else:
+            x = F.conv2d(x, weight, stride=1, padding=padding, dilation=dilation)
+        
+        return act(x) # Apply activation function
     
     def forward(self, x):
         """'forward()' applies the YOLO FPN to input data."""

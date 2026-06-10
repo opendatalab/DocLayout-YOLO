@@ -43,7 +43,6 @@ __all__ = (
 )
 
 
-
 class DFL(nn.Module):
     """
     Integral module of Distribution Focal Loss (DFL).
@@ -85,6 +84,12 @@ class Proto(nn.Module):
         """Performs a forward pass through layers using an upsampled input image."""
         return self.cv3(self.cv2(self.upsample(self.cv1(x))))
 
+    def fuse_custom(self):
+        for m in [self.cv1, self.cv2, self.cv3]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        return self
+
 
 class HGStem(nn.Module):
     """
@@ -116,6 +121,12 @@ class HGStem(nn.Module):
         x = self.stem4(x)
         return x
 
+    def fuse_custom(self):
+        for m in [self.stem1, self.stem2a, self.stem2b, self.stem3, self.stem4]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        return self
+
 
 class HGBlock(nn.Module):
     """
@@ -140,6 +151,15 @@ class HGBlock(nn.Module):
         y = self.ec(self.sc(torch.cat(y, 1)))
         return y + x if self.add else y
 
+    def fuse_custom(self):
+        for m in self.m:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        for m in [self.sc, self.ec]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        return self
+
 
 class SPP(nn.Module):
     """Spatial Pyramid Pooling (SPP) layer https://arxiv.org/abs/1406.4729."""
@@ -156,6 +176,13 @@ class SPP(nn.Module):
         """Forward pass of the SPP layer, performing spatial pyramid pooling."""
         x = self.cv1(x)
         return self.cv2(torch.cat([x] + [m(x) for m in self.m], 1))
+
+    def fuse_custom(self):
+        for m in [self.cv1, self.cv2]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        return self
+
 
 class SPPF(nn.Module):
     """Spatial Pyramid Pooling - Fast (SPPF) layer for YOLOv5 by Glenn Jocher."""
@@ -179,6 +206,12 @@ class SPPF(nn.Module):
         y2 = self.m(y1)
         return self.cv2(torch.cat((x, y1, y2, self.m(y2)), 1))
 
+    def fuse_custom(self):
+        for m in [self.cv1, self.cv2]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        return self
+
 
 class C1(nn.Module):
     """CSP Bottleneck with 1 convolution."""
@@ -193,6 +226,12 @@ class C1(nn.Module):
         """Applies cross-convolutions to input in the C3 module."""
         y = self.cv1(x)
         return self.m(y) + y
+
+    def fuse_custom(self):
+        for m in [self.cv1] + list(self.m):
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        return self
 
 
 class C2(nn.Module):
@@ -213,7 +252,17 @@ class C2(nn.Module):
         """Forward pass through the CSP bottleneck with 2 convolutions."""
         a, b = self.cv1(x).chunk(2, 1)
         return self.cv2(torch.cat((self.m(a), b), 1))
-    
+
+    def fuse_custom(self):
+        for m in [self.cv1, self.cv2]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        for m in self.m:
+            if hasattr(m, "fuse_custom"):
+                m.fuse_custom()
+        return self
+
+
 class C2f(nn.Module):
     """Faster Implementation of CSP Bottleneck with 2 convolutions."""
 
@@ -232,6 +281,15 @@ class C2f(nn.Module):
         y = list(self.cv1(x).chunk(2, 1))
         y.extend(m(y[-1]) for m in self.m)
         return self.cv2(torch.cat(y, 1))
+
+    def fuse_custom(self):
+        for m in [self.cv1, self.cv2]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        for m in self.m:
+            if hasattr(m, "fuse_custom"):
+                m.fuse_custom()
+        return self
 
     def forward_split(self, x):
         """Forward pass using split() instead of chunk()."""
@@ -255,6 +313,15 @@ class C3(nn.Module):
     def forward(self, x):
         """Forward pass through the CSP bottleneck with 2 convolutions."""
         return self.cv3(torch.cat((self.m(self.cv1(x)), self.cv2(x)), 1))
+
+    def fuse_custom(self):
+        for m in [self.cv1, self.cv2, self.cv3]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        for m in self.m:
+            if hasattr(m, "fuse_custom"):
+                m.fuse_custom()
+        return self
 
 
 class C3x(C3):
@@ -282,6 +349,15 @@ class RepC3(nn.Module):
     def forward(self, x):
         """Forward pass of RT-DETR neck layer."""
         return self.cv3(self.m(self.cv1(x)) + self.cv2(x))
+
+    def fuse_custom(self):
+        for m in [self.cv1, self.cv2, self.cv3]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        for m in self.m:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        return self
 
 
 class C3TR(C3):
@@ -324,6 +400,17 @@ class GhostBottleneck(nn.Module):
         """Applies skip connection and concatenation to input tensor."""
         return self.conv(x) + self.shortcut(x)
 
+    def fuse_custom(self):
+        for m in self.conv:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        if hasattr(self.shortcut, "fuse_custom"):
+            for m in self.shortcut:
+                if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                    m.fuse_custom()
+        return self
+
+
 class Bottleneck(nn.Module):
     """Standard bottleneck."""
 
@@ -340,7 +427,13 @@ class Bottleneck(nn.Module):
     def forward(self, x):
         """'forward()' applies the YOLO FPN to input data."""
         return x + self.cv2(self.cv1(x)) if self.add else self.cv2(self.cv1(x))
-    
+
+    def fuse_custom(self):
+        for m in [self.cv1, self.cv2]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        return self
+
 
 class BottleneckCSP(nn.Module):
     """CSP Bottleneck https://github.com/WongKinYiu/CrossStagePartialNetworks."""
@@ -363,6 +456,15 @@ class BottleneckCSP(nn.Module):
         y2 = self.cv2(x)
         return self.cv4(self.act(self.bn(torch.cat((y1, y2), 1))))
 
+    def fuse_custom(self):
+        for m in [self.cv1, self.cv4]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        for m in self.m:
+            if hasattr(m, "fuse_custom"):
+                m.fuse_custom()
+        return self
+
 
 class ResNetBlock(nn.Module):
     """ResNet block with standard convolution layers."""
@@ -379,6 +481,16 @@ class ResNetBlock(nn.Module):
     def forward(self, x):
         """Forward pass through the ResNet block."""
         return F.relu(self.cv3(self.cv2(self.cv1(x))) + self.shortcut(x))
+
+    def fuse_custom(self):
+        for m in [self.cv1, self.cv2, self.cv3]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        if hasattr(self.shortcut, "fuse_custom"):
+            for m in self.shortcut:
+                if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                    m.fuse_custom()
+        return self
 
 
 class ResNetLayer(nn.Module):
@@ -411,7 +523,7 @@ class MaxSigmoidAttnBlock(nn.Module):
         super().__init__()
         self.nh = nh
         self.hc = c2 // nh
-        self.ec = Conv(c1, ec, k=1, act=False) if c1 != ec else None
+        self.ec = ec
         self.gl = nn.Linear(gc, ec)
         self.bias = nn.Parameter(torch.zeros(nh))
         self.proj_conv = Conv(c1, c2, k=3, s=1, act=False)
@@ -465,6 +577,15 @@ class C2fAttn(nn.Module):
         y.extend(m(y[-1]) for m in self.m)
         y.append(self.attn(y[-1], guide))
         return self.cv2(torch.cat(y, 1))
+
+    def fuse_custom(self):
+        for m in [self.cv1, self.cv2]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        for m in self.m:
+            if hasattr(m, "fuse_custom"):
+                m.fuse_custom()
+        return self
 
 
 class ImagePoolingAttn(nn.Module):
@@ -573,6 +694,12 @@ class RepBottleneck(nn.Module):
         """Forward pass through RepBottleneck layer."""
         return x + self.cv2(self.cv1(x)) if self.add else self.cv2(self.cv1(x))
 
+    def fuse_custom(self):
+        for m in [self.cv1, self.cv2]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        return self
+
 
 class RepCSP(nn.Module):
     """Rep CSP Bottleneck with 3 convolutions."""
@@ -589,6 +716,15 @@ class RepCSP(nn.Module):
     def forward(self, x):
         """Forward pass through RepCSP layer."""
         return self.cv3(torch.cat((self.m(self.cv1(x)), self.cv2(x)), 1))
+
+    def fuse_custom(self):
+        for m in [self.cv1, self.cv2, self.cv3]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        for m in self.m:
+            if hasattr(m, "fuse_custom"):
+                m.fuse_custom()
+        return self
 
 
 class RepNCSPELAN4(nn.Module):
@@ -615,6 +751,18 @@ class RepNCSPELAN4(nn.Module):
         y.extend(m(y[-1]) for m in [self.cv2, self.cv3])
         return self.cv4(torch.cat(y, 1))
 
+    def fuse_custom(self):
+        for m in [self.cv1, self.cv4]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        if hasattr(self.cv2, "fuse_custom"):
+            self.cv2[0].fuse_custom() if hasattr(self.cv2[0], "fuse_custom") else None
+            self.cv2[1].fuse_custom() if hasattr(self.cv2[1], "fuse_custom") else None
+        if hasattr(self.cv3, "fuse_custom"):
+            self.cv3[0].fuse_custom() if hasattr(self.cv3[0], "fuse_custom") else None
+            self.cv3[1].fuse_custom() if hasattr(self.cv3[1], "fuse_custom") else None
+        return self
+
 
 class ADown(nn.Module):
     """ADown."""
@@ -635,6 +783,12 @@ class ADown(nn.Module):
         x2 = self.cv2(x2)
         return torch.cat((x1, x2), 1)
 
+    def fuse_custom(self):
+        for m in [self.cv1, self.cv2]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        return self
+
 
 class SPPELAN(nn.Module):
     """SPP-ELAN."""
@@ -654,6 +808,12 @@ class SPPELAN(nn.Module):
         y = [self.cv1(x)]
         y.extend(m(y[-1]) for m in [self.cv2, self.cv3, self.cv4])
         return self.cv5(torch.cat(y, 1))
+
+    def fuse_custom(self):
+        for m in [self.cv1, self.cv5]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        return self
 
 
 class Silence(nn.Module):
@@ -695,7 +855,8 @@ class CBFuse(nn.Module):
         """Forward pass through CBFuse layer."""
         target_size = xs[-1].shape[2:]
         res = [F.interpolate(x[self.idx[i]], size=target_size, mode="nearest") for i, x in enumerate(xs[:-1])]
-        out = torch.sum(torch.stack(res + xs[-1:]), dim=0)
+        # Optimized: use sum() instead of torch.sum(torch.stack(...)) to avoid extra allocation
+        out = sum(res + xs[-1:])
         return out
 
 
@@ -706,10 +867,14 @@ class RepVGGDW(torch.nn.Module):
         self.conv1 = Conv(ed, ed, 3, 1, 1, g=ed, act=False)
         self.dim = ed
         self.act = nn.SiLU()
-    
+
     def forward(self, x):
-        return self.act(self.conv(x) + self.conv1(x))
-    
+        # Support both unfused (has conv1) and fused (conv1 removed) states
+        c1 = getattr(self, 'conv1', None)
+        if c1 is None:
+            return self.act(self.conv(x))
+        return self.act(self.conv(x) + c1(x))
+
     def forward_fuse(self, x):
         return self.act(self.conv(x))
 
@@ -717,12 +882,12 @@ class RepVGGDW(torch.nn.Module):
     def fuse(self):
         conv = fuse_conv_and_bn(self.conv.conv, self.conv.bn)
         conv1 = fuse_conv_and_bn(self.conv1.conv, self.conv1.bn)
-        
+
         conv_w = conv.weight
         conv_b = conv.bias
         conv1_w = conv1.weight
         conv1_b = conv1.bias
-        
+
         conv1_w = torch.nn.functional.pad(conv1_w, [2,2,2,2])
 
         final_conv_w = conv_w + conv1_w
@@ -732,7 +897,12 @@ class RepVGGDW(torch.nn.Module):
         conv.bias.data.copy_(final_conv_b)
 
         self.conv = conv
-        del self.conv1
+        # Remove conv1 and switch to fused forward for efficiency
+        if hasattr(self, 'conv1'):
+            del self.conv1
+        self.forward = self.forward_fuse
+        self.fused = True
+
 
 class CIB(nn.Module):
     """Standard bottleneck."""
@@ -753,9 +923,18 @@ class CIB(nn.Module):
 
         self.add = shortcut and c1 == c2
 
+    def fuse_custom(self):
+        for m in self.cv1:
+            if isinstance(m, Conv) and not getattr(m, 'fused', False):
+                m.fuse_custom()
+            elif isinstance(m, RepVGGDW) and not getattr(m, 'fused', False):
+                m.fuse()
+        return self
+
     def forward(self, x):
         """'forward()' applies the YOLO FPN to input data."""
         return x + self.cv1(x) if self.add else self.cv1(x)
+
 
 class C2fCIB(C2f):
     """Faster Implementation of CSP Bottleneck with 2 convolutions."""
@@ -766,6 +945,15 @@ class C2fCIB(C2f):
         """
         super().__init__(c1, c2, n, shortcut, g, e)
         self.m = nn.ModuleList(CIB(self.c, self.c, shortcut, e=1.0, lk=lk) for _ in range(n))
+
+    def fuse_custom(self):
+        if not getattr(self.cv1, 'fused', False):
+            self.cv1.fuse_custom()
+        if not getattr(self.cv2, 'fused', False):
+            self.cv2.fuse_custom()
+        for block in self.m:
+            block.fuse_custom()
+        return self
 
 
 class Attention(nn.Module):
@@ -796,6 +984,13 @@ class Attention(nn.Module):
         x = self.proj(x)
         return x
 
+    def fuse_custom(self):
+        for m in [self.qkv, self.proj, self.pe]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        return self
+
+
 class PSA(nn.Module):
 
     def __init__(self, c1, c2, e=0.5):
@@ -804,18 +999,31 @@ class PSA(nn.Module):
         self.c = int(c1 * e)
         self.cv1 = Conv(c1, 2 * self.c, 1, 1)
         self.cv2 = Conv(2 * self.c, c1, 1)
-        
+
         self.attn = Attention(self.c, attn_ratio=0.5, num_heads=self.c // 64)
         self.ffn = nn.Sequential(
             Conv(self.c, self.c*2, 1),
             Conv(self.c*2, self.c, 1, act=False)
         )
-        
+
     def forward(self, x):
         a, b = self.cv1(x).split((self.c, self.c), dim=1)
         b = b + self.attn(b)
         b = b + self.ffn(b)
         return self.cv2(torch.cat((a, b), 1))
+
+    def fuse_custom(self):
+        if not getattr(self.cv1, 'fused', False):
+            self.cv1.fuse_custom()
+        if not getattr(self.cv2, 'fused', False):
+            self.cv2.fuse_custom()
+        for m in self.ffn:
+            if isinstance(m, Conv) and not getattr(m, 'fused', False):
+                m.fuse_custom()
+        if hasattr(self.attn, "fuse_custom"):
+            self.attn.fuse_custom()
+        return self
+
 
 class SCDown(nn.Module):
     def __init__(self, c1, c2, k, s):
@@ -825,3 +1033,9 @@ class SCDown(nn.Module):
 
     def forward(self, x):
         return self.cv2(self.cv1(x))
+
+    def fuse_custom(self):
+        for m in [self.cv1, self.cv2]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        return self

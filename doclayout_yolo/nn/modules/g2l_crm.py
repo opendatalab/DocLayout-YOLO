@@ -9,6 +9,7 @@ import torch
 from torch import nn, Tensor
 import torch.nn.functional as F
 
+
 class DilatedBlock(nn.Module):
     """Standard bottleneck with dilated convolution."""
 
@@ -21,23 +22,38 @@ class DilatedBlock(nn.Module):
         self.k = k
         self.cv2 = Conv(c, c, k=1, s=1)
         self.add = shortcut
-        
+
         self.fuse = fuse
         if fuse == "glu":
             self.conv_gating = Conv(c*len(self.dilation), c*len(self.dilation), k=1, s=1, g=c*len(self.dilation))
             self.conv1x1 = Conv(c*len(self.dilation), c, k=1, s=1, g=c)
         elif fuse == "sum":
             self.conv1x1 = Conv(c, c, k=1, s=1, g=c)
-            
+
         self.dcv = Conv(c, c, k=self.k, s=1)
 
     def dilated_conv(self, x, dilation):
-        act = self.dcv.act
-        bn = self.dcv.bn
+        """Apply dilated convolution using the shared Conv weight.
+
+        Handles fused checkpoints where `bn` may be missing or replaced with nn.Identity.
+        """
         weight = self.dcv.conv.weight
-        padding = dilation * (self.k//2)
-        return act(bn(F.conv2d(x, weight, stride=1, padding=padding, dilation=dilation)))
-    
+        padding = dilation * (self.k // 2)
+
+        # Check if bn exists and is a real BatchNorm (not Identity)
+        bn = getattr(self.dcv, "bn", None)
+        has_bn = isinstance(bn, nn.BatchNorm2d)
+
+        if has_bn:
+            x = F.conv2d(x, weight, stride=1, padding=padding, dilation=dilation)
+            x = bn(x)
+        else:
+            # Fused: use bias directly from conv
+            bias = getattr(self.dcv.conv, "bias", None)
+            x = F.conv2d(x, weight, bias=bias, stride=1, padding=padding, dilation=dilation)
+
+        return self.dcv.act(x)
+
     def forward(self, x):
         """'forward()' applies the YOLO FPN to input data."""
         dx = [self.dilated_conv(x, d) for d in self.dilation]
@@ -48,13 +64,19 @@ class DilatedBlock(nn.Module):
             dx = dx * G  # Element-wise multiplication
             dx = self.conv1x1(dx)
         elif self.fuse == "sum":
-            dx = [_dx.unsqueeze(0) for _dx in dx]
-            dx = torch.cat(dx, dim=0)
-            dx = torch.sum(dx, dim=0)
+            # Optimized: avoid torch.stack allocation of [n_dilation, B, C, H, W]
+            dx = sum(dx)
             dx = self.conv1x1(dx)
-            
+
         return x + dx if self.add else dx
-        
+
+    def fuse_custom(self):
+        """Fuse Conv+BN in all submodules."""
+        for m in [self.cv2, self.conv1x1, self.dcv]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        return self
+
 
 class DilatedBottleneck(nn.Module):
     """Standard bottleneck with dilated convolution."""
@@ -64,18 +86,28 @@ class DilatedBottleneck(nn.Module):
         expansion.
         """
         super().__init__()
-        
+
         c_ = int(c2 * e)  # hidden channels
         self.cv1 = Conv(c1, c_, k[0], 1)
         self.cv2 = Conv(c_, c2, k[1], 1, g=g)
-        
+
         self.dilated_block = DilatedBlock(c_, dilation, block_k, fuse)
         self.add = shortcut and c1 == c2
 
     def forward(self, x):
         """'forward()' applies the YOLO FPN to input data."""
         return x + self.cv2(self.dilated_block(self.cv1(x))) if self.add else self.cv2(self.dilated_block(self.cv1(x)))
-    
+
+    def fuse_custom(self):
+        """Fuse Conv+BN in all submodules."""
+        for m in [self.cv1, self.cv2]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        if hasattr(self.dilated_block, "fuse_custom"):
+            self.dilated_block.fuse_custom()
+        return self
+
+
 class G2L_CRM(nn.Module):
     """Faster Implementation of CSP Bottleneck with 2 convolutions."""
 
@@ -120,3 +152,13 @@ class G2L_CRM(nn.Module):
         for m in self.m:
             y.append(m(y[-1]))
         return self.cv2(torch.cat(y, 1))
+
+    def fuse_custom(self):
+        """Fuse all Conv+BN in G2L_CRM."""
+        for m in [self.cv1, self.cv2]:
+            if hasattr(m, "fuse_custom") and not getattr(m, "fused", False):
+                m.fuse_custom()
+        for m in self.m:
+            if hasattr(m, "fuse_custom"):
+                m.fuse_custom()
+        return self

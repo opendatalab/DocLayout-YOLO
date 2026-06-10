@@ -44,14 +44,57 @@ class Conv(nn.Module):
         self.conv = nn.Conv2d(c1, c2, k, s, autopad(k, p, d), groups=g, dilation=d, bias=False)
         self.bn = nn.BatchNorm2d(c2)
         self.act = self.default_act if act is True else act if isinstance(act, nn.Module) else nn.Identity()
+        self.fused = False
 
     def forward(self, x):
         """Apply convolution, batch normalization and activation to input tensor."""
+        # Guard: if already fused or bn was removed/Identity, skip bn
+        if getattr(self, "fused", False) or not hasattr(self, "bn") or isinstance(getattr(self, "bn", None), nn.Identity):
+            return self.act(self.conv(x))
         return self.act(self.bn(self.conv(x)))
 
     def forward_fuse(self, x):
         """Perform transposed convolution of 2D data."""
         return self.act(self.conv(x))
+
+    def fuse_custom(self):
+        """Fuse Conv2d() and BatchNorm2d() layers into a single Conv2d with bias."""
+        if getattr(self, "fused", False) or not hasattr(self, "bn"):
+            self.fused = True
+            return self
+
+        w = self.conv.weight
+        b = self.conv.bias if self.conv.bias is not None else torch.zeros(
+            self.conv.out_channels, device=w.device, dtype=w.dtype
+        )
+
+        bn_mean = self.bn.running_mean
+        bn_var = self.bn.running_var
+        bn_weight = self.bn.weight
+        bn_bias = self.bn.bias
+
+        std = torch.sqrt(bn_var + self.bn.eps)
+        scale = (bn_weight / std).view(-1, 1, 1, 1)
+
+        fused_weight = w * scale
+        fused_bias = bn_weight * (b - bn_mean) / std + bn_bias
+
+        self.conv = nn.Conv2d(
+            self.conv.in_channels,
+            self.conv.out_channels,
+            self.conv.kernel_size,
+            self.conv.stride,
+            self.conv.padding,
+            self.conv.dilation,
+            self.conv.groups,
+            bias=True
+        )
+        self.conv.weight.data = fused_weight
+        self.conv.bias.data = fused_bias
+
+        self.bn = nn.Identity()
+        self.fused = True
+        return self
 
 
 class Conv2(Conv):

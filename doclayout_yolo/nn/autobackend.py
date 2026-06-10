@@ -18,6 +18,7 @@ from doclayout_yolo.utils import ARM64, LINUX, LOGGER, ROOT, yaml_load
 from doclayout_yolo.utils.checks import check_requirements, check_suffix, check_version, check_yaml
 from doclayout_yolo.utils.downloads import attempt_download_asset, is_url
 
+
 def check_class_names(names):
     """
     Check class names.
@@ -56,22 +57,22 @@ class AutoBackend(nn.Module):
     The AutoBackend class is designed to provide an abstraction layer for various inference engines. It supports a wide
     range of formats, each with specific naming conventions as outlined below:
 
-        Supported Formats and Naming Conventions:
-            | Format                | File Suffix      |
-            |-----------------------|------------------|
-            | PyTorch               | *.pt             |
-            | TorchScript           | *.torchscript    |
-            | ONNX Runtime          | *.onnx           |
-            | ONNX OpenCV DNN       | *.onnx (dnn=True)|
-            | OpenVINO              | *openvino_model/ |
-            | CoreML                | *.mlpackage      |
-            | TensorRT              | *.engine         |
-            | TensorFlow SavedModel | *_saved_model    |
-            | TensorFlow GraphDef   | *.pb             |
-            | TensorFlow Lite       | *.tflite         |
-            | TensorFlow Edge TPU   | *_edgetpu.tflite |
-            | PaddlePaddle          | *_paddle_model   |
-            | NCNN                  | *_ncnn_model     |
+    Supported Formats and Naming Conventions:
+    | Format                 | File Suffix       |
+    |------------------------|-------------------|
+    | PyTorch                | *.pt              |
+    | TorchScript            | *.torchscript     |
+    | ONNX Runtime           | *.onnx            |
+    | ONNX OpenCV DNN        | *.onnx (dnn=True) |
+    | OpenVINO               | *openvino_model/  |
+    | CoreML                 | *.mlpackage       |
+    | TensorRT               | *.engine          |
+    | TensorFlow SavedModel  | *_saved_model     |
+    | TensorFlow GraphDef    | *.pb              |
+    | TensorFlow Lite        | *.tflite          |
+    | TensorFlow Edge TPU    | *_edgetpu.tflite  |
+    | PaddlePaddle           | *_paddle_model    |
+    | NCNN                   | *_ncnn_model      |
 
     This class offers dynamic backend switching capabilities based on the input model format, making it easier to deploy
     models across various platforms.
@@ -220,8 +221,8 @@ class AutoBackend(nn.Module):
             except ImportError:
                 if LINUX:
                     check_requirements("nvidia-tensorrt", cmds="-U --index-url https://pypi.ngc.nvidia.com")
-                import tensorrt as trt  # noqa
-            check_version(trt.__version__, "7.0.0", hard=True)  # require tensorrt>=7.0.0
+                    import tensorrt as trt  # noqa
+                check_version(trt.__version__, "7.0.0", hard=True)  # require tensorrt>=7.0.0
             if device.type == "cpu":
                 device = torch.device("cuda:0")
             Binding = namedtuple("Binding", ("name", "dtype", "shape", "data", "ptr"))
@@ -231,27 +232,27 @@ class AutoBackend(nn.Module):
                 meta_len = int.from_bytes(f.read(4), byteorder="little")  # read metadata length
                 metadata = json.loads(f.read(meta_len).decode("utf-8"))  # read metadata
                 model = runtime.deserialize_cuda_engine(f.read())  # read engine
-            context = model.create_execution_context()
-            bindings = OrderedDict()
-            output_names = []
-            fp16 = False  # default updated below
-            dynamic = False
-            for i in range(model.num_bindings):
-                name = model.get_binding_name(i)
-                dtype = trt.nptype(model.get_binding_dtype(i))
-                if model.binding_is_input(i):
-                    if -1 in tuple(model.get_binding_shape(i)):  # dynamic
-                        dynamic = True
-                        context.set_binding_shape(i, tuple(model.get_profile_shape(0, i)[2]))
-                    if dtype == np.float16:
-                        fp16 = True
-                else:  # output
-                    output_names.append(name)
-                shape = tuple(context.get_binding_shape(i))
-                im = torch.from_numpy(np.empty(shape, dtype=dtype)).to(device)
-                bindings[name] = Binding(name, dtype, shape, im, int(im.data_ptr()))
-            binding_addrs = OrderedDict((n, d.ptr) for n, d in bindings.items())
-            batch_size = bindings["images"].shape[0]  # if dynamic, this is instead max batch size
+                context = model.create_execution_context()
+                bindings = OrderedDict()
+                output_names = []
+                fp16 = False  # default updated below
+                dynamic = False
+                for i in range(model.num_bindings):
+                    name = model.get_binding_name(i)
+                    dtype = trt.nptype(model.get_binding_dtype(i))
+                    if model.binding_is_input(i):
+                        if -1 in tuple(model.get_binding_shape(i)):  # dynamic
+                            dynamic = True
+                            context.set_binding_shape(i, tuple(model.get_profile_shape(0, i)[2]))
+                        if dtype == np.float16:
+                            fp16 = True
+                    else:  # output
+                        output_names.append(name)
+                        shape = tuple(context.get_binding_shape(i))
+                        im = torch.from_numpy(np.empty(shape, dtype=dtype)).to(device)
+                        bindings[name] = Binding(name, dtype, shape, im, int(im.data_ptr()))
+                binding_addrs = OrderedDict((n, d.ptr) for n, d in bindings.items())
+                batch_size = bindings["images"].shape[0]  # if dynamic, this is instead max batch size
 
         # CoreML
         elif coreml:
@@ -363,7 +364,8 @@ class AutoBackend(nn.Module):
 
             raise TypeError(
                 f"model='{w}' is not a supported model format. "
-                f"See https://docs.doclayout_yolo.com/modes/predict for help.\n\n{export_formats()}"
+                f"See https://docs.doclayout_yolo.com/modes/predict for help."
+                f"{export_formats()}"
             )
 
         # Load external metadata YAML
@@ -387,12 +389,15 @@ class AutoBackend(nn.Module):
         # Check names
         if "names" not in locals():  # names missing
             names = default_class_names(data)
-        names = check_class_names(names)
+            names = check_class_names(names)
 
-        # Disable gradients
+        # Disable gradients — FIX: handle non-leaf parameters from fused checkpoints
         if pt:
             for p in model.parameters():
-                p.requires_grad = False
+                if not p.is_leaf:
+                    p.data = p.data.detach()
+                else:
+                    p.requires_grad = False
 
         self.__dict__.update(locals())  # assign all variables to self
 
@@ -484,11 +489,11 @@ class AutoBackend(nn.Module):
                     "Ultralytics only supports inference of non-pipelined CoreML models exported with "
                     f"'nms=False', but 'model={w}' has an NMS pipeline created by an 'nms=True' export."
                 )
-                # TODO: CoreML NMS inference handling
-                # from doclayout_yolo.utils.ops import xywh2xyxy
-                # box = xywh2xyxy(y['coordinates'] * [[w, h, w, h]])  # xyxy pixels
-                # conf, cls = y['confidence'].max(1), y['confidence'].argmax(1).astype(np.float32)
-                # y = np.concatenate((box, conf.reshape(-1, 1), cls.reshape(-1, 1)), 1)
+            # TODO: CoreML NMS inference handling
+            # from doclayout_yolo.utils.ops import xywh2xyxy
+            # box = xywh2xyxy(y['coordinates'] * [[w, h, w, h]])  # xyxy pixels
+            # conf, cls = y['confidence'].max(1), y['confidence'].argmax(1).astype(np.float32)
+            # y = np.concatenate((box, conf.reshape(-1, 1), cls.reshape(-1, 1)), 1)
             elif len(y) == 1:  # classification model
                 y = list(y.values())
             elif len(y) == 2:  # segmentation model
@@ -526,32 +531,32 @@ class AutoBackend(nn.Module):
                     ip, ib = (0, 1) if len(y[0].shape) == 4 else (1, 0)  # index of protos, boxes
                     nc = y[ib].shape[1] - y[ip].shape[3] - 4  # y = (1, 160, 160, 32), (1, 116, 8400)
                     self.names = {i: f"class{i}" for i in range(nc)}
-            else:  # Lite or Edge TPU
-                details = self.input_details[0]
-                integer = details["dtype"] in (np.int8, np.int16)  # is TFLite quantized int8 or int16 model
-                if integer:
-                    scale, zero_point = details["quantization"]
-                    im = (im / scale + zero_point).astype(details["dtype"])  # de-scale
-                self.interpreter.set_tensor(details["index"], im)
-                self.interpreter.invoke()
-                y = []
-                for output in self.output_details:
-                    x = self.interpreter.get_tensor(output["index"])
+                else:  # Lite or Edge TPU
+                    details = self.input_details[0]
+                    integer = details["dtype"] in (np.int8, np.int16)  # is TFLite quantized int8 or int16 model
                     if integer:
-                        scale, zero_point = output["quantization"]
-                        x = (x.astype(np.float32) - zero_point) * scale  # re-scale
-                    if x.ndim > 2:  # if task is not classification
-                        # Denormalize xywh by image size. See https://github.com/doclayout_yolo/doclayout_yolo/pull/1695
-                        # xywh are normalized in TFLite/EdgeTPU to mitigate quantization error of integer models
-                        x[:, [0, 2]] *= w
-                        x[:, [1, 3]] *= h
-                    y.append(x)
-            # TF segment fixes: export is reversed vs ONNX export and protos are transposed
-            if len(y) == 2:  # segment with (det, proto) output order reversed
-                if len(y[1].shape) != 4:
-                    y = list(reversed(y))  # should be y = (1, 116, 8400), (1, 160, 160, 32)
-                y[1] = np.transpose(y[1], (0, 3, 1, 2))  # should be y = (1, 116, 8400), (1, 32, 160, 160)
-            y = [x if isinstance(x, np.ndarray) else x.numpy() for x in y]
+                        scale, zero_point = details["quantization"]
+                        im = (im / scale + zero_point).astype(details["dtype"])  # de-scale
+                    self.interpreter.set_tensor(details["index"], im)
+                    self.interpreter.invoke()
+                    y = []
+                    for output in self.output_details:
+                        x = self.interpreter.get_tensor(output["index"])
+                        if integer:
+                            scale, zero_point = output["quantization"]
+                            x = (x.astype(np.float32) - zero_point) * scale  # re-scale
+                        if x.ndim > 2:  # if task is not classification
+                            # Denormalize xywh by image size. See https://github.com/doclayout_yolo/doclayout_yolo/pull/1695
+                            # xywh are normalized in TFLite/EdgeTPU to mitigate quantization error of integer models
+                            x[:, [0, 2]] *= w
+                            x[:, [1, 3]] *= h
+                        y.append(x)
+                    # TF segment fixes: export is reversed vs ONNX export and protos are transposed
+                    if len(y) == 2:  # segment with (det, proto) output order reversed
+                        if len(y[1].shape) != 4:
+                            y = list(reversed(y))  # should be y = (1, 116, 8400), (1, 160, 160, 32)
+                        y[1] = np.transpose(y[1], (0, 3, 1, 2))  # should be y = (1, 116, 8400), (1, 32, 160, 160)
+                    y = [x if isinstance(x, np.ndarray) else x.numpy() for x in y]
 
         # for x in y:
         #     print(type(x), len(x)) if isinstance(x, (list, tuple)) else print(type(x), x.shape)  # debug shapes

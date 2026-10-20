@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=70.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "doclayout-yolo"
+dynamic = ["version"]
+description = "DocLayout-YOLO document layout analysis models and tools."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "AGPL-3.0"}
+keywords = ["document layout analysis", "object detection", "YOLOv12"]
+dependencies = [
+    "numpy>=1.23",
+    "matplotlib>=3.3",
+    "opencv-python>=4.6",
+    "Pillow>=7.1",
+    "PyYAML>=5.3",
+    "requests>=2.23",
+    "scipy>=1.4",
+    "torch==2.6.0",
+    "torchvision==0.21.0",
+    "tqdm>=4.64",
+    "psutil",
+    "py-cpuinfo",
+    "pandas>=1.1",
+    "seaborn>=0.11",
+    "ultralytics-thop>=2.0",
+    "huggingface-hub>=0.23",
+]
+
+[tool.setuptools]
+packages = {find = {where = ["."], include = ["ultralytics", "ultralytics.*"]}}
+
+[tool.setuptools.package-data]
+ultralytics = ["cfg/**/*.yaml", "assets/*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "ultralytics.__version__"}

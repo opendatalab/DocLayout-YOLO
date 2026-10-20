@@ -1,0 +1,66 @@
+# YOLOv12 🚀, AGPL-3.0 license
+# YOLOv12 object detection model with P3-P5 outputs. For Usage examples see https://docs.ultralytics.com/tasks/detect
+# CFG file for YOLOv12-turbo
+
+# Parameters
+nc: 80 # number of classes
+scales: # model compound scaling constants, i.e. 'model=yolov12n.yaml' will call yolov12.yaml with scale 'n'
+  # [depth, width, max_channels]
+  n: [0.50, 0.25, 1024] 
+  s: [0.50, 0.50, 1024] 
+  m: [0.50, 1.00, 512] 
+  l: [1.00, 1.00, 512] 
+  x: [1.00, 1.50, 512] 
+
+
+# YOLO12-turbo P6 backbone (修改版)
+backbone:
+  # [from, repeats, module, args]
+  - [-1, 1, Conv,  [64, 3, 2]] # 0-P1/2
+  - [-1, 1, Conv,  [128, 3, 2, 1, 2]] # 1-P2/4
+  - [-1, 2, C3k2,  [256, False, 0.25]] # 2
+  - [-1, 1, Conv,  [256, 3, 2, 1, 4]] # 3-P3/8
+  - [-1, 2, C3k2,  [512, False, 0.25]] # 4 (P3 特征图)
+  - [-1, 1, Conv,  [512, 3, 2]] # 5-P4/16
+  # 你的修改 1: area=4 -> 8
+  - [-1, 4, A2C2f, [512, True, 8]] # 6 (P4 特征图) 
+  - [-1, 1, Conv,  [1024, 3, 2]] # 7-P5/32
+  # 你的修改 2: area=1 -> 4
+  - [-1, 4, A2C2f, [1024, True, 4]] # 8 (P5 特征图)
+  
+  # 你的修改 3: 新增 P6/64 阶段
+  - [-1, 1, Conv,  [2048, 3, 2]] # 9-P6/64
+  - [-1, 4, A2C2f, [2048, True, 1]] # 10 (P6 特征图)
+
+# YOLO12-turbo P6 head (修改版)
+head:
+  # Top-down FPN (P6 -> P5 -> P4 -> P3)
+  # 从新的 P6 (L10) 开始上采样
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]] # 11 (来自 L10, P6)
+  - [[-1, 8], 1, Concat, [1]] # 12 (连接 L8, P5)
+  - [-1, 2, A2C2f, [1024, False, -1]] # 13 (P5-head)
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]] # 14 (来自 L13, P5-head)
+  - [[-1, 6], 1, Concat, [1]] # 15 (连接 L6, P4)
+  - [-1, 2, A2C2f, [512, False, -1]] # 16 (P4-head)
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]] # 17 (来自 L16, P4-head)
+  - [[-1, 4], 1, Concat, [1]] # 18 (连接 L4, P3)
+  - [-1, 2, A2C2f, [256, False, -1]] # 19 (P3-head 输出) <--- Detect 1 (P3)
+
+  # Bottom-up PAN (P3 -> P4 -> P5 -> P6)
+  - [-1, 1, Conv, [256, 3, 2]] # 20 (下采样 P3-head)
+  - [[-1, 16], 1, Concat, [1]] # 21 (连接 L16, P4-head)
+  - [-1, 2, A2C2f, [512, False, -1]] # 22 (P4-head-down 输出) <--- Detect 2 (P4)
+
+  - [-1, 1, Conv, [512, 3, 2]] # 23 (下采样 P4-head-down)
+  - [[-1, 13], 1, Concat, [1]] # 24 (连接 L13, P5-head)
+  - [-1, 2, C3k2, [1024, True]] # 25 (P5-head-down 输出) <--- Detect 3 (P5) 
+
+  # 新增的 P6 路径
+  - [-1, 1, Conv, [1024, 3, 2]] # 26 (下采样 P5-head-down)
+  - [[-1, 10], 1, Concat, [1]] # 27 (连接 L10, P6-backbone)
+  - [-1, 2, C3k2, [2048, True]] # 28 (P6-head-down 输出) <--- Detect 4 (P6)
+  
+  # 新的 Detect 层，使用 P3, P4, P5, P6 四个输出
+  - [[19, 22, 25, 28], 1, Detect, [nc]] # Detect(P3, P4, P5, P6)

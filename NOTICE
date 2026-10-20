@@ -1,0 +1,12 @@
+# Notices
+
+This source distribution contains a modified DocLayout-YOLO/Ultralytics source tree. The source files retain their applicable upstream license notices; see
+`LICENSE` for the AGPL-3.0 license text.
+
+The release tree keeps the `ultralytics` Python namespace because serialized
+PyTorch checkpoints refer to that namespace. Anonymous event telemetry is disabled in this distribution. No model checkpoint, dataset, private
+configuration, credential, or remote operations script is included here.
+
+Model and dataset licenses must be reviewed separately before external
+redistribution. The weight manifest is a provenance and packaging aid, not a
+license grant.

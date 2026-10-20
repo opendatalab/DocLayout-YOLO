@@ -1,0 +1,36 @@
+# ---- weights (all checkpoints are on Hugging Face; see README Main Results / Training) ----
+weights/
+*.pt
+
+# ---- editor/session backups ----
+*.bak
+*.bak-*
+*~
+
+# ---- datasets & training/eval outputs ----
+datasets/
+runs/
+output/
+outputs/
+predictions/
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+.venv/
+.conda/
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# ---- Ultralytics runtime caches ----
+*.cache
+.u5/
+.ultralytics/
